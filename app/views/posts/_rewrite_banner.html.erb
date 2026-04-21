@@ -1,0 +1,8 @@
+<section class="rewrite-banner">
+  <p class="eyebrow"><%= t("posts.rewrite_banner.eyebrow") %></p>
+  <h2 class="section-title"><%= t("posts.rewrite_banner.title") %></h2>
+  <p><%= post.rewrite_reason %></p>
+  <% if editable %>
+    <p><%= t("posts.rewrite_banner.recovery_note") %></p>
+  <% end %>
+</section>

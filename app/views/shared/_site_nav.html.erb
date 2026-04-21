@@ -5,6 +5,11 @@
     </li>
 
     <% if current_user.present? %>
+      <% if submit_nav_visible? %>
+        <li>
+          <%= link_to t("nav.submit"), submit_path, class: nav_link_class(submit_path) %>
+        </li>
+      <% end %>
       <li class="site-nav__status">
         <span class="eyebrow"><%= t("nav.account_label") %></span>
         <span><%= current_user.pseudonym %></span>

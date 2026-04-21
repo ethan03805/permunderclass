@@ -1,0 +1,4 @@
+<% content_for :title, page_title(t("posts.form.edit_title")) %>
+<% content_for :meta_description, t("posts.form.intro") %>
+
+<%= render "form", post: @post %>

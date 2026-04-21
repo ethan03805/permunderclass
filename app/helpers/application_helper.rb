@@ -13,7 +13,19 @@ module ApplicationHelper
     request.query_parameters.symbolize_keys.merge(overrides)
   end
 
-  def post_permalink_path(post)
-    "/posts/#{post.id}-#{post.slug}"
+  def submit_nav_visible?
+    current_user&.active?
+  end
+
+  def post_linter_messages
+    t("posts.linter.flags")
+  end
+
+  def post_type_labels
+    t("post_types")
+  end
+
+  def build_status_labels
+    t("build_statuses")
   end
 end

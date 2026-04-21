@@ -1,0 +1,197 @@
+<section class="submit-layout">
+  <div class="page-stack">
+    <div class="auth-shell">
+      <p class="eyebrow"><%= t("posts.form.eyebrow") %></p>
+      <h1 class="auth-shell__title"><%= post.persisted? ? t("posts.form.edit_title") : t("posts.form.create_title") %></h1>
+      <p><%= t("posts.form.intro") %></p>
+    </div>
+
+    <% if post.rewrite_requested? %>
+      <%= render "rewrite_banner", post: post, editable: true %>
+    <% end %>
+
+    <%= form_with model: post,
+      url: post.persisted? ? post_path(post) : submit_path,
+      method: post.persisted? ? :patch : :post,
+      html: {
+        multipart: true,
+        data: {
+          controller: "post-form",
+          post_form_post_type_value: post.post_type,
+          post_form_linter_messages_value: post_linter_messages,
+          post_form_type_labels_value: post_type_labels,
+          post_form_build_status_labels_value: build_status_labels,
+          post_form_existing_image_url_value: (post.image.attached? ? url_for(post.image) : nil),
+          post_form_existing_image_filename_value: (post.image.attached? ? post.image.filename.to_s : nil),
+          post_form_existing_video_url_value: (post.video.attached? ? url_for(post.video) : nil),
+          post_form_existing_video_filename_value: (post.video.attached? ? post.video.filename.to_s : nil)
+        }
+      },
+      class: "submit-grid" do |form| %>
+      <div class="form-shell">
+        <%= render "shared/form_errors", object: post %>
+
+        <% unless post.persisted? %>
+          <%= form.hidden_field :post_type, value: post.post_type %>
+        <% end %>
+
+        <div class="field-group">
+          <label><%= t("posts.form.type_label") %></label>
+          <p class="field-hint">
+            <%= t("post_types.#{post.post_type}") %>.
+            <% unless post.persisted? %>
+              <%= link_to t("posts.form.change_type"), submit_path %>
+            <% end %>
+          </p>
+        </div>
+
+        <div class="field-group">
+          <%= form.label :title, t("activerecord.attributes.post.title") %>
+          <%= form.text_field :title, maxlength: 140, data: { post_form_target: "titleInput", action: "input->post-form#sync" } %>
+        </div>
+
+        <div class="field-group">
+          <%= form.label :body, t("activerecord.attributes.post.body") %>
+          <%= form.text_area :body, rows: 12, maxlength: 10000, data: { post_form_target: "bodyInput", action: "input->post-form#sync" } %>
+        </div>
+
+        <% if post.post_type_shipped? || post.post_type_build? %>
+          <div class="field-group">
+            <%= form.label :link_url, t("activerecord.attributes.post.link_url") %>
+            <%= form.url_field :link_url, placeholder: t("posts.form.link_placeholder"), data: { post_form_target: "linkInput", action: "input->post-form#sync" } %>
+            <p class="field-hint"><%= t("posts.form.link_hint.#{post.post_type}") %></p>
+          </div>
+        <% end %>
+
+        <% if post.post_type_build? %>
+          <div class="field-group">
+            <%= form.label :build_status, t("activerecord.attributes.post.build_status") %>
+            <%= form.select :build_status,
+              options_for_select(build_status_labels.map { |value, label| [ label, value ] }, post.build_status),
+              { prompt: t("posts.form.build_status_prompt") },
+              { class: "filter-select", data: { post_form_target: "buildStatusSelect", action: "change->post-form#sync" } } %>
+          </div>
+        <% end %>
+
+        <fieldset class="field-group">
+          <legend><%= t("posts.form.tags_label") %></legend>
+          <p class="field-hint"><%= t("posts.form.tags_hint") %></p>
+          <div class="checkbox-list">
+            <% @available_tags.each do |tag| %>
+              <label class="filter-checkbox">
+                <%= check_box_tag "post[tag_ids][]", tag.id, Array(@selected_tag_ids).presence ? @selected_tag_ids.include?(tag.id) : post.tags.include?(tag), data: { post_form_target: "tagInput", action: "change->post-form#sync" } %>
+                <span><%= tag.name %></span>
+              </label>
+            <% end %>
+          </div>
+          <% archived_tags = post.tags.archived %>
+          <% if archived_tags.any? %>
+            <p class="field-hint"><%= t("posts.form.archived_tags_notice", tags: archived_tags.map(&:name).join(", ")) %></p>
+          <% end %>
+        </fieldset>
+
+        <% if post.post_type_shipped? || post.post_type_build? %>
+          <div class="field-group">
+            <%= form.label :image, t("posts.form.image_label") %>
+            <%= form.file_field :image, accept: "image/jpeg,image/png,image/webp", data: { post_form_target: "imageInput", action: "change->post-form#handleImageChange" } %>
+            <p class="field-hint"><%= t("posts.form.image_hint") %></p>
+            <% if post.image.attached? %>
+              <label class="filter-checkbox">
+                <%= form.check_box :remove_image, data: { post_form_target: "removeImageInput", action: "change->post-form#sync" } %>
+                <span><%= t("posts.form.remove_image") %></span>
+              </label>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if post.post_type_build? %>
+          <div class="field-group">
+            <%= form.label :video, t("posts.form.video_label") %>
+            <%= form.file_field :video, accept: "video/mp4", data: { post_form_target: "videoInput", action: "change->post-form#handleVideoChange" } %>
+            <p class="field-hint"><%= t("posts.form.video_hint") %></p>
+            <% if post.video.attached? %>
+              <label class="filter-checkbox">
+                <%= form.check_box :remove_video, data: { post_form_target: "removeVideoInput", action: "change->post-form#sync" } %>
+                <span><%= t("posts.form.remove_video") %></span>
+              </label>
+            <% end %>
+          </div>
+        <% end %>
+
+        <section class="linter-panel" aria-live="polite">
+          <p class="eyebrow"><%= t("posts.linter.eyebrow") %></p>
+          <h2 class="section-title"><%= t("posts.linter.title") %></h2>
+          <p><%= t("posts.linter.intro") %></p>
+          <p class="field-hint" data-post-form-target="warningEmpty"><%= t("posts.linter.clear") %></p>
+          <ul class="linter-warning-list" role="list" data-post-form-target="warningList">
+            <% post.linter_flags.each do |flag| %>
+              <li><%= t("posts.linter.flags.#{flag}") %></li>
+            <% end %>
+          </ul>
+        </section>
+
+        <div class="form-actions">
+          <%= form.submit(post.persisted? ? t("posts.form.submit_update") : t("posts.form.submit_create"), class: "button") %>
+        </div>
+      </div>
+
+      <aside class="preview-column">
+        <%= render "style_guide" %>
+
+        <section class="preview-shell">
+          <p class="eyebrow"><%= t("posts.preview.eyebrow") %></p>
+          <h2 class="section-title"><%= t("posts.preview.title") %></h2>
+
+          <article class="post-detail post-preview">
+            <p class="eyebrow" data-post-form-target="previewType"><%= t("post_types.#{post.post_type}") %></p>
+            <h3 class="post-detail__title" data-post-form-target="previewTitle" data-empty-text="<%= t("posts.preview.empty_title") %>"><%= post.title.presence || t("posts.preview.empty_title") %></h3>
+            <p class="post-detail__meta">
+              <span><%= current_user.pseudonym %></span>
+              <% if post.post_type_build? %>
+                <span class="post-card__divider" aria-hidden="true">·</span>
+                <span data-post-form-target="previewBuildStatus" data-empty-text="<%= t("posts.preview.build_status_placeholder") %>"><%= post.build_status.present? ? t("build_statuses.#{post.build_status}") : t("posts.preview.build_status_placeholder") %></span>
+              <% end %>
+            </p>
+
+            <ul class="post-card__tags" role="list" data-post-form-target="previewTags" data-empty-text="<%= t("posts.preview.no_tags") %>">
+              <% if post.tags.any? %>
+                <% post.tags.each do |tag| %>
+                  <li><%= tag.name %></li>
+                <% end %>
+              <% else %>
+                <li><%= t("posts.preview.no_tags") %></li>
+              <% end %>
+            </ul>
+
+            <p class="post-detail__link <%= "is-hidden" if post.link_url.blank? %>" data-post-form-target="previewLink">
+              <a href="<%= post.link_url.presence || "#" %>" target="_blank" rel="noopener noreferrer" data-post-form-target="previewLinkAnchor"><%= post.link_url.presence || t("posts.preview.link_placeholder") %></a>
+            </p>
+
+            <figure class="post-detail__media <%= "is-hidden" unless post.image.attached? %>" data-post-form-target="previewImageSection">
+              <img
+                alt=""
+                class="post-detail__image"
+                data-post-form-target="previewImage"
+                src="<%= post.image.attached? ? url_for(post.image) : "" %>"
+              >
+            </figure>
+
+            <figure class="post-detail__media <%= "is-hidden" unless post.video.attached? %>" data-post-form-target="previewVideoSection">
+              <video
+                class="post-detail__video"
+                controls
+                preload="metadata"
+                data-post-form-target="previewVideo"
+                src="<%= post.video.attached? ? url_for(post.video) : "" %>"
+              ></video>
+            </figure>
+
+            <p class="field-hint <%= "is-hidden" if post.image.attached? || post.video.attached? %>" data-post-form-target="previewMediaEmpty"><%= t("posts.preview.media_placeholder") %></p>
+
+            <div class="post-detail__body post-preview__body" data-post-form-target="previewBody" data-empty-text="<%= t("posts.preview.empty_body") %>"><%= post.body.presence || t("posts.preview.empty_body") %></div>
+          </article>
+        </section>
+      </aside>
+    <% end %>
+  </div>
+</section>

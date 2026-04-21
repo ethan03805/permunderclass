@@ -1,0 +1,21 @@
+<% content_for :title, page_title(t("posts.picker.title")) %>
+<% content_for :meta_description, t("posts.picker.intro") %>
+
+<section class="page-stack">
+  <div class="auth-shell">
+    <p class="eyebrow"><%= t("posts.picker.eyebrow") %></p>
+    <h1 class="auth-shell__title"><%= t("posts.picker.title") %></h1>
+    <p><%= t("posts.picker.intro") %></p>
+  </div>
+
+  <ul class="type-picker" role="list">
+    <% Post.post_types.keys.each do |post_type| %>
+      <li class="type-picker__item">
+        <p class="eyebrow"><%= t("post_types.#{post_type}") %></p>
+        <h2 class="section-title"><%= t("posts.picker.options.#{post_type}.title") %></h2>
+        <p><%= t("posts.picker.options.#{post_type}.body") %></p>
+        <%= link_to t("posts.picker.options.#{post_type}.cta"), submit_path(post_type: post_type), class: "button" %>
+      </li>
+    <% end %>
+  </ul>
+</section>

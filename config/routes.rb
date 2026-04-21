@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
   root "home#index"
 
+  get "submit", to: "posts#new", as: :submit
+  post "submit", to: "posts#create"
+  resources :posts, only: [ :show, :edit, :update ]
+
   get "sign-in", to: "sessions#new", as: :sign_in
   post "sign-in", to: "sessions#create"
   delete "sign-out", to: "sessions#destroy", as: :sign_out

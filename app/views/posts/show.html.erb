@@ -1,0 +1,69 @@
+<% content_for :title, page_title(@post.title) %>
+<% content_for :meta_description, truncate(@post.body, length: 160) %>
+
+<article class="post-detail">
+  <% if @post.rewrite_requested? %>
+    <%= render "rewrite_banner", post: @post, editable: @post.owned_by?(current_user) && current_user&.active? %>
+  <% elsif @post.removed? %>
+    <section class="rewrite-banner">
+      <p class="eyebrow"><%= t("posts.detail.status_label") %></p>
+      <h2 class="section-title"><%= t("posts.detail.statuses.removed.title") %></h2>
+      <p><%= t("posts.detail.statuses.removed.body") %></p>
+    </section>
+  <% end %>
+
+  <header class="post-detail__header">
+    <div class="post-detail__heading">
+      <p class="eyebrow"><%= t("post_types.#{@post.post_type}") %></p>
+      <h1 class="post-detail__title"><%= @post.title %></h1>
+    </div>
+
+    <div class="post-detail__actions">
+      <% if @post.owned_by?(current_user) && current_user&.active? && !@post.removed? %>
+        <%= link_to t("posts.detail.edit"), edit_post_path(@post), class: "button" %>
+      <% end %>
+    </div>
+  </header>
+
+  <p class="post-detail__meta">
+    <span><%= @post.user.pseudonym %></span>
+    <span class="post-card__divider" aria-hidden="true">·</span>
+    <time datetime="<%= @post.published_at.iso8601 %>"><%= l(@post.published_at, format: :short) %></time>
+    <% if @post.edited_at.present? %>
+      <span class="post-card__divider" aria-hidden="true">·</span>
+      <span><%= t("posts.detail.edited_at", date: l(@post.edited_at, format: :short)) %></span>
+    <% end %>
+    <% if @post.post_type_build? && @post.build_status.present? %>
+      <span class="post-card__divider" aria-hidden="true">·</span>
+      <span><%= t("build_statuses.#{@post.build_status}") %></span>
+    <% end %>
+  </p>
+
+  <% if @post.tags.any? %>
+    <ul class="post-card__tags" role="list">
+      <% @post.tags.each do |tag| %>
+        <li><%= link_to tag.name, tag_path(tag.slug) %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <% if @post.link_url.present? %>
+    <p class="post-detail__link">
+      <%= link_to @post.link_url, @post.link_url, target: "_blank", rel: "noopener noreferrer" %>
+    </p>
+  <% end %>
+
+  <% if @post.image.attached? %>
+    <figure class="post-detail__media">
+      <%= image_tag @post.image, alt: @post.title, class: "post-detail__image" %>
+    </figure>
+  <% elsif @post.video.attached? %>
+    <figure class="post-detail__media">
+      <%= video_tag url_for(@post.video), controls: true, preload: "metadata", class: "post-detail__video" %>
+    </figure>
+  <% end %>
+
+  <div class="post-detail__body">
+    <%= simple_format(@post.body) %>
+  </div>
+</article>

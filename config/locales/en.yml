@@ -46,6 +46,7 @@ en:
   nav:
     primary: "Primary navigation"
     home: "Home"
+    submit: "Submit"
     sign_in: "Sign in"
     sign_out: "Sign out"
     sign_up: "Create account"
@@ -140,6 +141,106 @@ en:
     shipped: "Shipped"
     build: "Build"
     discussion: "Discussion"
+  build_statuses:
+    sharing: "Sharing"
+    want_feedback: "Want feedback"
+    looking_for_testers: "Looking for testers"
+  posts:
+    picker:
+      eyebrow: "Submit"
+      title: "Choose a post type"
+      intro: "Pick the format first, then fill in the fields for that kind of post."
+      options:
+        shipped:
+          title: "Share something that is already out"
+          body: "Shipped posts require a title, a link, body copy, and one image."
+          cta: "Start a shipped post"
+        build:
+          title: "Share work in progress"
+          body: "Build posts require a title, body copy, a build status, and either one image or one short video."
+          cta: "Start a build post"
+        discussion:
+          title: "Start a discussion"
+          body: "Discussion posts are text-first and do not allow media attachments."
+          cta: "Start a discussion"
+    form:
+      eyebrow: "Submit"
+      create_title: "Publish a post"
+      edit_title: "Edit your post"
+      intro: "Keep the copy plain, concrete, and specific."
+      type_label: "Post type"
+      change_type: "Choose a different type"
+      link_hint:
+        shipped: "Use the main public URL for the shipped project."
+        build: "Optional for build posts. Add a URL only if it helps people evaluate the work."
+      link_placeholder: "https://"
+      build_status_prompt: "Choose a build status"
+      tags_label: "Tags"
+      tags_hint: "Select up to 3 existing tags."
+      archived_tags_notice: "Archived tags already on this post will stay attached for now: %{tags}."
+      image_label: "Image"
+      image_hint: "Allowed types: JPEG, PNG, or WebP. Maximum size: 5 MB."
+      video_label: "Video"
+      video_hint: "Allowed type: MP4 (H.264), up to 30 seconds and 50 MB."
+      remove_image: "Remove the current image"
+      remove_video: "Remove the current video"
+      submit_create: "Publish post"
+      submit_update: "Save changes"
+    preview:
+      eyebrow: "Preview"
+      title: "Saved output preview"
+      empty_title: "Your title appears here."
+      empty_body: "Your post body appears here."
+      no_tags: "No tags selected yet."
+      link_placeholder: "Link preview"
+      build_status_placeholder: "Build status appears here."
+      media_placeholder: "Media preview appears after you select an image or video."
+    style_guide:
+      eyebrow: "Style guide"
+      title: "Keep it plain"
+      rules:
+        say_what_it_is: "Say what it is."
+        say_state: "Say what state it is in."
+        say_audience: "Say who it is for."
+        avoid_slogans: "Avoid slogans."
+        avoid_fundraising: "Avoid fundraising language."
+        avoid_launch_day_hype: "Avoid launch-day hype framing."
+    linter:
+      eyebrow: "Hype linter"
+      title: "Warnings only"
+      intro: "These warnings mirror the non-blocking server-side flags saved with the post."
+      clear: "No hype warnings right now."
+      flags:
+        repeated_emoji_sequences: "Repeated emoji sequences can read as hype."
+        revolutionize: "\"Revolutionize\" usually reads as inflated framing."
+        game_changer: "\"Game changer\" usually reads as inflated framing."
+        disrupt: "\"Disrupt\" usually reads as inflated framing."
+        ten_x: "\"10x\" usually reads as inflated framing."
+        unicorn: "\"Unicorn\" usually reads as inflated framing."
+        world_class: "\"World-class\" usually reads as inflated framing."
+        best_in_class: "\"Best-in-class\" usually reads as inflated framing."
+        groundbreaking: "\"Groundbreaking\" usually reads as inflated framing."
+        next_gen: "\"Next-gen\" usually reads as inflated framing."
+        seamless: "\"Seamless\" usually reads as inflated framing."
+        all_caps_word_runs: "All-caps word runs can read as hype."
+        multiple_exclamation_marks: "Multiple exclamation marks can read as hype."
+        exaggerated_urgency: "Urgency language can read as hype."
+    detail:
+      edit: "Edit post"
+      edited_at: "Edited %{date}"
+      status_label: "Status"
+      statuses:
+        removed:
+          title: "Removed post"
+          body: "This post is hidden from public listings and is visible here only because you have moderation access."
+    rewrite_banner:
+      eyebrow: "Rewrite requested"
+      title: "This post needs revision"
+      recovery_note: "A valid save will publish the post back into feed and tag listings."
+    notices:
+      created: "Your post has been published."
+      updated: "Your post has been updated."
+      rewrite_recovered: "Your post has been updated and returned to published status."
   forms:
     errors:
       eyebrow: "Review"
@@ -297,9 +398,16 @@ en:
               present: "is not allowed for this post type"
             image:
               required: "must be attached for a shipped post"
+              invalid_content_type: "must be a JPEG, PNG, or WebP image"
               present: "is not allowed for this post type"
+              too_large: "must be 5 MB or smaller"
             video:
+              invalid_codec: "must use the H.264 codec"
+              invalid_content_type: "must be an MP4 video"
               present: "is not allowed for this post type"
+              too_large: "must be 50 MB or smaller"
+              too_long: "must be 30 seconds or shorter"
+              uninspectable: "could not be inspected"
             tags:
               too_many: "cannot exceed 3"
             rewrite_reason:

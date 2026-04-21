@@ -1,0 +1,9 @@
+<section class="style-guide">
+  <p class="eyebrow"><%= t("posts.style_guide.eyebrow") %></p>
+  <h2 class="section-title"><%= t("posts.style_guide.title") %></h2>
+  <ul class="style-guide__list" role="list">
+    <% t("posts.style_guide.rules").each_value do |rule| %>
+      <li><%= rule %></li>
+    <% end %>
+  </ul>
+</section>

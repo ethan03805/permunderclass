@@ -150,6 +150,10 @@ class PostTest < ActiveSupport::TestCase
     assert_includes post.errors[:linter_flags], I18n.t("activerecord.errors.models.post.attributes.linter_flags.invalid")
   end
 
+  test "to_param includes the slugged id" do
+    assert_equal "#{posts(:commented_post).id}-#{posts(:commented_post).slug}", posts(:commented_post).to_param
+  end
+
   test "hot score is computed from score and published_at" do
     post = Post.new(published_at: Time.at(1_134_028_003), score: 10)
     hot = post.compute_hot_score
@@ -186,6 +190,45 @@ class PostTest < ActiveSupport::TestCase
     post.image.attach(io: StringIO.new("image"), filename: "test.png", content_type: "image/png")
     assert_not post.valid?
     assert_includes post.errors[:image], I18n.t("activerecord.errors.models.post.attributes.image.present")
+  end
+
+  test "image validation rejects unsupported content types" do
+    post = Post.new(user: users(:active_member), post_type: :shipped, title: "Ship", body: "Body", link_url: "https://example.com")
+    post.image.attach(uploaded_large_file(filename: "invalid-image.gif", content_type: "image/gif", size: 256))
+
+    assert_not post.valid?
+    assert_includes post.errors[:image], I18n.t("activerecord.errors.models.post.attributes.image.invalid_content_type")
+  end
+
+  test "image validation rejects images over 5 MB" do
+    post = Post.new(user: users(:active_member), post_type: :shipped, title: "Ship", body: "Body", link_url: "https://example.com")
+    post.image.attach(uploaded_large_file(filename: "large-image.png", content_type: "image/png", size: Post::MAX_IMAGE_SIZE + 1))
+
+    assert_not post.valid?
+    assert_includes post.errors[:image], I18n.t("activerecord.errors.models.post.attributes.image.too_large")
+  end
+
+  test "video validation accepts short h264 mp4 files" do
+    post = Post.new(user: users(:active_member), post_type: :build, title: "Build", body: "Body", build_status: :sharing)
+    post.video.attach(uploaded_mp4(filename: "valid-h264.mp4", duration: 1, codec: "libx264"))
+
+    assert post.valid?, post.errors.full_messages.to_sentence
+  end
+
+  test "video validation rejects non-h264 mp4 files" do
+    post = Post.new(user: users(:active_member), post_type: :build, title: "Build", body: "Body", build_status: :sharing)
+    post.video.attach(uploaded_mp4(filename: "invalid-codec.mp4", duration: 1, codec: "mpeg4"))
+
+    assert_not post.valid?
+    assert_includes post.errors[:video], I18n.t("activerecord.errors.models.post.attributes.video.invalid_codec")
+  end
+
+  test "video validation rejects clips longer than 30 seconds" do
+    post = Post.new(user: users(:active_member), post_type: :build, title: "Build", body: "Body", build_status: :sharing)
+    post.video.attach(uploaded_mp4(filename: "too-long.mp4", duration: 31, codec: "libx264"))
+
+    assert_not post.valid?
+    assert_includes post.errors[:video], I18n.t("activerecord.errors.models.post.attributes.video.too_long")
   end
 
   test "refresh_vote_counters recalculates counts and hot score" do
@@ -236,5 +279,11 @@ class PostTest < ActiveSupport::TestCase
   test "feed_by_types scope returns posts matching types" do
     result = Post.feed_by_types([ "discussion" ])
     assert_includes result, posts(:commented_post)
+  end
+
+  test "rewrite requested posts remain visible on direct url while removed posts do not" do
+    assert posts(:rewrite_requested_post).visible_to?(nil)
+    assert_not posts(:removed_post).visible_to?(users(:active_member))
+    assert posts(:removed_post).visible_to?(users(:moderator))
   end
 end

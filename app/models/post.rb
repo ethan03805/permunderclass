@@ -1,8 +1,13 @@
 class Post < ApplicationRecord
   MAX_TAGS = 3
   HOT_SCORE_EPOCH = 1_134_028_003
+  IMAGE_CONTENT_TYPES = %w[image/jpeg image/png image/webp].freeze
+  VIDEO_CONTENT_TYPE = "video/mp4"
+  MAX_IMAGE_SIZE = 5.megabytes
+  MAX_VIDEO_SIZE = 50.megabytes
+  MAX_VIDEO_DURATION_SECONDS = 30
 
-  attr_accessor :raw_linter_flags_input
+  attr_accessor :raw_linter_flags_input, :remove_image, :remove_video
 
   belongs_to :user
   has_many :post_tags, dependent: :destroy
@@ -25,12 +30,15 @@ class Post < ApplicationRecord
   validates :slug, uniqueness: { case_sensitive: false }, allow_blank: true
   validate :type_specific_rules
   validate :media_structure_rules
+  validate :image_attachment_rules
+  validate :video_attachment_rules
   validate :tag_count_within_limit
   validate :rewrite_reason_required_for_rewrite_requested
   validate :linter_flags_must_be_an_array
   validate :published_at_immutable, on: :update
 
   before_validation :normalize_fields
+  before_validation :schedule_media_changes
   before_validation :initialize_cached_fields, on: :create
   before_validation :assign_slug, if: :should_assign_slug?
   before_validation :normalize_linter_flags
@@ -38,6 +46,7 @@ class Post < ApplicationRecord
   before_validation :sync_hot_score, if: :published_at?
   before_create :apply_publication_fields
   before_update :touch_edited_at, if: :tracked_edit?
+  after_commit :finalize_media_changes, on: [ :create, :update ]
 
   scope :feed_published, -> { where(status: :published) }
   scope :feed_recent, -> { where(published_at: 14.days.ago..) }
@@ -65,8 +74,28 @@ class Post < ApplicationRecord
     PostRanking.compute(score: score, published_at: published_at)
   end
 
+  def self.find_by_slugged_id!(value)
+    find(value.to_s.split("-").first)
+  end
+
   def compute_hot_score
     PostRanking.compute(score: score.to_i, published_at: published_at)
+  end
+
+  def to_param
+    return super if slug.blank?
+
+    "#{id}-#{slug}"
+  end
+
+  def visible_to?(viewer)
+    return true if published? || rewrite_requested?
+
+    removed? && viewer&.role.in?(%w[moderator admin])
+  end
+
+  def owned_by?(viewer)
+    user_id == viewer&.id
   end
 
   def linter_flags=(value)
@@ -114,6 +143,13 @@ class Post < ApplicationRecord
     self.body = body.to_s.strip.presence
     self.link_url = link_url.to_s.strip.presence
     self.rewrite_reason = rewrite_reason.to_s.strip.presence
+  end
+
+  def schedule_media_changes
+    @remove_image_after_commit = remove_image_requested? && attachment_changes["image"].blank? && image.attached?
+    @remove_video_after_commit = remove_video_requested? && attachment_changes["video"].blank? && video.attached?
+    @replace_image_after_commit = attachment_changes["video"].present? && image.attached?
+    @replace_video_after_commit = attachment_changes["image"].present? && video.attached?
   end
 
   def initialize_cached_fields
@@ -176,17 +212,63 @@ class Post < ApplicationRecord
   def media_structure_rules
     case post_type
     when "shipped"
-      errors.add(:image, :required) unless image.attached?
-      errors.add(:video, :present) if video.attached?
+      errors.add(:image, :required) unless effective_image_attached?
+      errors.add(:video, :present) if effective_video_attached?
     when "build"
-      if image.attached? && video.attached?
+      if effective_image_attached? && effective_video_attached?
         errors.add(:base, :too_many_media)
-      elsif !image.attached? && !video.attached?
+      elsif !effective_image_attached? && !effective_video_attached?
         errors.add(:base, :media_required)
       end
     when "discussion"
-      errors.add(:image, :present) if image.attached?
-      errors.add(:video, :present) if video.attached?
+      errors.add(:image, :present) if effective_image_attached?
+      errors.add(:video, :present) if effective_video_attached?
+    end
+  end
+
+  def image_attachment_rules
+    return unless image.attached?
+
+    if image.blob.byte_size > MAX_IMAGE_SIZE
+      errors.add(:image, :too_large)
+    end
+
+    return if IMAGE_CONTENT_TYPES.include?(image.blob.content_type)
+
+    errors.add(:image, :invalid_content_type)
+  end
+
+  def video_attachment_rules
+    return unless video.attached?
+
+    if video.blob.byte_size > MAX_VIDEO_SIZE
+      errors.add(:video, :too_large)
+      return
+    end
+
+    unless video.blob.content_type == VIDEO_CONTENT_TYPE
+      errors.add(:video, :invalid_content_type)
+      return
+    end
+
+    metadata = if pending_video_upload_path.present?
+      VideoMetadata.inspect(pending_video_upload_path)
+    elsif attachment_changes["video"].present?
+      VideoMetadata::Result.new(available: false)
+    else
+      VideoMetadata.inspect(video.blob)
+    end
+    unless metadata.available?
+      errors.add(:video, :uninspectable)
+      return
+    end
+
+    if metadata.codec_name != "h264"
+      errors.add(:video, :invalid_codec)
+    end
+
+    if metadata.duration_seconds.to_f > MAX_VIDEO_DURATION_SECONDS
+      errors.add(:video, :too_long)
     end
   end
 
@@ -214,5 +296,43 @@ class Post < ApplicationRecord
     return unless will_save_change_to_published_at?
 
     errors.add(:published_at, :immutable)
+  end
+
+  def effective_image_attached?
+    return true if attachment_changes["image"].present?
+    return false if remove_image_requested?
+    return false if attachment_changes["video"].present?
+
+    image.attached?
+  end
+
+  def effective_video_attached?
+    return true if attachment_changes["video"].present?
+    return false if remove_video_requested?
+    return false if attachment_changes["image"].present?
+
+    video.attached?
+  end
+
+  def remove_image_requested?
+    ActiveModel::Type::Boolean.new.cast(remove_image)
+  end
+
+  def remove_video_requested?
+    ActiveModel::Type::Boolean.new.cast(remove_video)
+  end
+
+  def finalize_media_changes
+    image.detach if @remove_image_after_commit || @replace_image_after_commit
+    video.detach if @remove_video_after_commit || @replace_video_after_commit
+  ensure
+    @remove_image_after_commit = false
+    @remove_video_after_commit = false
+    @replace_image_after_commit = false
+    @replace_video_after_commit = false
+  end
+
+  def pending_video_upload_path
+    attachment_changes["video"]&.attachable&.try(:tempfile)&.path
   end
 end
