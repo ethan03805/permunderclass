@@ -1,0 +1,360 @@
+# Files in the config/locales directory are used for internationalization and
+# are automatically loaded by Rails. If you want to use locales other than
+# English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t "hello"
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t("hello") %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# To learn more about the API, please read the Rails Internationalization guide
+# at https://guides.rubyonrails.org/i18n.html.
+#
+# Be aware that YAML interprets the following case-insensitive strings as
+# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
+# must be quoted to be interpreted as strings. For example:
+#
+#     en:
+#       "yes": yup
+#       enabled: "ON"
+
+en:
+  time:
+    formats:
+      short: "%b %-d, %Y"
+  errors:
+    messages:
+      too_many_media: "cannot have both an image and a video"
+      media_required: "must include an image or a video"
+  app:
+    name: "permanentunderclass.me"
+    title: "permanentunderclass.me"
+    description: "A restrained community site for pseudonymous builders."
+  layouts:
+    skip_to_content: "Skip to main content"
+  header:
+    summary: "A restrained community site for pseudonymous builders."
+  nav:
+    primary: "Primary navigation"
+    home: "Home"
+    sign_in: "Sign in"
+    sign_out: "Sign out"
+    sign_up: "Create account"
+    account_label: "Account"
+    account_state_label: "State"
+    availability_label: "Status"
+    availability_value: "The feed is live. Submission routes will appear as later packages are completed."
+    account_states:
+      active: "Active"
+      pending_email_verification: "Pending email verification"
+      suspended: "Suspended"
+      banned: "Banned"
+  home:
+    eyebrow: "Application shell"
+    title: "A restrained starting point"
+    description: "Shared layout, responsive structure, and locale-backed placeholder copy for permanentunderclass.me."
+    intro: "The base layout, shared navigation, footer, design tokens, and copy registry are in place. Account creation, sign-in, email verification, and password reset now share the same shell. Feed and submission flows will be added next."
+    sections:
+      overview:
+        title: "Current surface"
+        body: "The shell is intentionally simple. Spacing, borders, and type hierarchy carry the layout instead of decorative components."
+      features:
+        shell:
+          title: "Shared layout"
+          body: "Header, navigation, main content, and footer now render from one responsive application shell."
+        access:
+          title: "Planned access model"
+          body: "Browsing remains open. Account creation and sign-in are available now. Posting, commenting, and voting will remain gated behind verified accounts when those features arrive."
+        progression:
+          title: "Incremental delivery"
+          body: "The interface is prepared for future feed, authentication, submission, profile, and moderation screens without changing the visual rules."
+    registry:
+      title: "Copy registry"
+      body: "Visible interface copy is centralized in locale files from the start so later features can extend the same structure."
+      items:
+        layout: "Base layout strings live in the locale registry."
+        navigation: "Shared header, navigation, and footer labels live in the locale registry."
+        tokens: "Design tokens define colors, spacing, type, and responsive width scales."
+        copy: "Placeholder copy stays generic and functional until a formal voice document exists."
+  footer:
+    current_state:
+      eyebrow: "Current state"
+      title: "Application shell"
+      body: "The site now has a stable frame for future pages and flows."
+    copy_registry:
+      eyebrow: "Content"
+      title: "Centralized strings"
+      body: "User-facing copy is served from locale files so new packages extend one shared registry."
+    constraints:
+      eyebrow: "Constraints"
+      title: "Visual rules"
+      body: "The interface stays text-first, responsive, and restrained, with underlined links and no shadows or gradients."
+  feed:
+    title: "Feed"
+    description: "Latest posts from the community."
+    empty: "No posts match the current filters."
+    score:
+      one: "%{score} point"
+      other: "%{score} points"
+    comments:
+      one: "%{count} comment"
+      other: "%{count} comments"
+    sorts:
+      label: "Sort"
+      hot: "Hot"
+      new: "New"
+      top: "Top"
+    windows:
+      label: "Window"
+      day: "Day"
+      week: "Week"
+      month: "Month"
+      all: "All time"
+    types:
+      label: "Types"
+      shipped: "Shipped"
+      build: "Build"
+      discussion: "Discussion"
+    tag_filter:
+      label: "Tag"
+    filters:
+      apply: "Apply filters"
+    pagination:
+      previous: "Previous"
+      next: "Next"
+      page: "Page %{page} of %{total_pages}"
+  tags:
+    title: "Tag: %{name}"
+    not_found: "That tag does not exist."
+    empty: "No published posts for this tag."
+  post_types:
+    shipped: "Shipped"
+    build: "Build"
+    discussion: "Discussion"
+  forms:
+    errors:
+      eyebrow: "Review"
+      title:
+        one: "1 issue needs attention"
+        other: "%{count} issues need attention"
+  auth:
+    fields:
+      email: "Email"
+      password: "Password"
+      password_confirmation: "Confirm password"
+      pseudonym: "Pseudonym"
+    guards:
+      already_signed_in: "You are already signed in."
+      authentication_required: "You need to sign in before continuing."
+      email_verification_required: "You need to verify your email before using that action."
+      account_states:
+        suspended: "This account is suspended."
+        banned: "This account is banned."
+    sign_up:
+      eyebrow: "Account"
+      title: "Create an account"
+      intro: "Use an email address and a pseudonym. Verification is required before posting, commenting, or voting."
+      pseudonym_hint: "Use 3 to 30 letters, numbers, or underscores."
+      submit: "Create account"
+      success: "Your account has been created. Check your email to verify it before interacting."
+      supporting_copy_html: "Already have an account? <a href=\"%{sign_in_path}\">Sign in</a>."
+    sign_in:
+      eyebrow: "Session"
+      title: "Sign in"
+      intro: "Use the email address and password linked to your pseudonymous account."
+      submit: "Sign in"
+      success: "You are signed in."
+      pending_email_verification: "You are signed in. Verify your email before posting, commenting, or voting."
+      invalid_credentials: "Those credentials do not match an account."
+      supporting_copy_html: "Need an account? <a href=\"%{sign_up_path}\">Create one</a>."
+    sign_out:
+      success: "You are signed out."
+    email_verification:
+      invalid: "That verification link is invalid or has expired."
+      already_verified: "That email address is already verified."
+      success: "Your email address is now verified."
+    password_reset:
+      link: "Reset password"
+      invalid: "That password reset link is invalid or has expired."
+      create:
+        success: "If the account exists, password reset instructions have been sent."
+      update:
+        success: "Your password has been updated."
+      new:
+        eyebrow: "Account recovery"
+        title: "Request a password reset"
+        intro: "Enter the email address linked to your account."
+        submit: "Send reset instructions"
+      edit:
+        eyebrow: "Account recovery"
+        title: "Set a new password"
+        intro: "Choose a new password for your account."
+        submit: "Update password"
+  mailers:
+    user_mailer:
+      email_verification:
+        subject: "Verify your email address"
+        greeting: "Hello %{pseudonym},"
+        body: "Use the link below to verify your email address."
+        cta: "Verify email address"
+        expiry: "This link expires in 7 days."
+      password_reset:
+        subject: "Reset your password"
+        greeting: "Hello %{pseudonym},"
+        body: "Use the link below to choose a new password."
+        cta: "Reset password"
+        expiry: "This link expires in 30 minutes."
+  activerecord:
+    models:
+      user: "Account"
+      tag: "Tag"
+      post: "Post"
+      post_tag: "Tagging"
+      comment: "Comment"
+      post_vote: "Vote"
+      comment_vote: "Vote"
+      report: "Report"
+      moderator_action: "Moderator action"
+    attributes:
+      user:
+        email: "Email"
+        password: "Password"
+        password_confirmation: "Confirm password"
+        pseudonym: "Pseudonym"
+      tag:
+        name: "Name"
+        slug: "Slug"
+      post:
+        title: "Title"
+        body: "Body"
+        link_url: "Link"
+        build_status: "Build status"
+        published_at: "Published at"
+        rewrite_reason: "Rewrite reason"
+      comment:
+        body: "Body"
+        parent: "Parent comment"
+      report:
+        details: "Details"
+      post_tag:
+        post: "Post"
+      moderator_action:
+        public_note: "Public note"
+        internal_note: "Internal note"
+        moderator: "Moderator"
+    errors:
+      models:
+        user:
+          attributes:
+            base:
+              turnstile_failed: "Turnstile verification could not be completed."
+            email:
+              blank: "must be present"
+              invalid: "must be a valid email address"
+              taken: "is already in use"
+            password:
+              blank: "must be present"
+              confirmation: "must match the confirmation"
+              too_short: "must be at least %{count} characters"
+            pseudonym:
+              blank: "must be present"
+              invalid: "may include only letters, numbers, and underscores"
+              taken: "is already in use"
+              too_short: "must be at least %{count} characters"
+              too_long: "must be %{count} characters or fewer"
+        tag:
+          attributes:
+            name:
+              blank: "must be present"
+              taken: "is already in use"
+            slug:
+              blank: "must be present"
+              taken: "is already in use"
+        post:
+          attributes:
+            title:
+              blank: "must be present"
+              too_long: "must be %{count} characters or fewer"
+            body:
+              blank: "must be present"
+              too_long: "must be %{count} characters or fewer"
+            link_url:
+              blank: "must be present"
+              invalid: "must start with http or https"
+            published_at:
+              immutable: "cannot be changed after publish"
+            build_status:
+              blank: "must be present for a build post"
+              present: "is not allowed for this post type"
+            image:
+              required: "must be attached for a shipped post"
+              present: "is not allowed for this post type"
+            video:
+              present: "is not allowed for this post type"
+            tags:
+              too_many: "cannot exceed 3"
+            rewrite_reason:
+              blank: "must be present when requesting a rewrite"
+            linter_flags:
+              invalid: "must be a list of linter flags"
+          base:
+            too_many_media: "cannot have both an image and a video"
+            media_required: "must include an image or a video"
+        comment:
+          attributes:
+            body:
+              blank: "must be present"
+              too_long: "must be %{count} characters or fewer"
+            depth:
+              greater_than_or_equal_to: "must be at least %{count}"
+              less_than_or_equal_to: "must be %{count} or fewer"
+            parent:
+              invalid_post: "must belong to the same post"
+              self_reference: "cannot reference itself"
+              descendant: "cannot reference a descendant"
+        report:
+          attributes:
+            resolved_by_id:
+              blank: "must be present when resolving"
+            resolved_at:
+              blank: "must be present when resolving"
+            resolved_by:
+              invalid_role: "must be a moderator or admin"
+            target_type:
+              inclusion: "must be a valid report target"
+        post_vote:
+          attributes:
+            user_id:
+              taken: "has already voted on this post"
+            value:
+              inclusion: "must be up or down"
+        comment_vote:
+          attributes:
+            user_id:
+              taken: "has already voted on this comment"
+            value:
+              inclusion: "must be up or down"
+        post_tag:
+          attributes:
+            post:
+              too_many: "cannot have more than 3 tags"
+        moderator_action:
+          attributes:
+            public_note:
+              blank: "must be present"
+            internal_note:
+              blank: "must be present"
+            moderator:
+              invalid_role: "must be a moderator or admin"
+            target_type:
+              inclusion: "must be a valid moderation target"
+              invalid_for_action: "does not match the moderation action"

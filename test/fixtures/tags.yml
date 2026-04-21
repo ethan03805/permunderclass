@@ -1,0 +1,9 @@
+active_tag:
+  name: "indie"
+  slug: "indie"
+  state: active
+
+archived_tag:
+  name: "legacy"
+  slug: "legacy"
+  state: archived

@@ -1,0 +1,7 @@
+request_rewrite_action:
+  moderator: moderator
+  target: rewrite_requested_post (Post)
+  action_type: rewrite_requested
+  public_note: "Please add more detail."
+  internal_note: "Author is responsive."
+  metadata: {}

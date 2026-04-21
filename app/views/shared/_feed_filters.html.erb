@@ -1,0 +1,60 @@
+<div class="feed-filters">
+  <nav class="filter-group" aria-label="<%= t("feed.sorts.label") %>">
+    <ul class="filter-list" role="list">
+      <% FeedQuery::SORTS.each do |sort| %>
+        <li>
+          <% window_value = sort == "top" && @query.sort == "top" && @query.window != "all" ? @query.window : nil %>
+          <%= link_to t("feed.sorts.#{sort}"), feed_params_for(sort: sort, window: window_value, page: nil), class: "filter-link#{" is-active" if @query.sort == sort}" %>
+        </li>
+      <% end %>
+    </ul>
+  </nav>
+
+  <form class="filter-form" method="get" action="<%= request.path %>">
+    <% if @query.sort.present? && @query.sort != "hot" %>
+      <input type="hidden" name="sort" value="<%= @query.sort %>">
+    <% end %>
+
+    <% if @query.sort == "top" %>
+      <fieldset class="filter-fieldset">
+        <legend class="eyebrow"><%= t("feed.windows.label") %></legend>
+        <select name="window" class="filter-select">
+          <% FeedQuery::WINDOWS.each do |window| %>
+            <option value="<%= window %>"<%= " selected" if @query.window == window %>>
+              <%= t("feed.windows.#{window}") %>
+            </option>
+          <% end %>
+        </select>
+      </fieldset>
+    <% end %>
+
+    <fieldset class="filter-fieldset">
+      <legend class="eyebrow"><%= t("feed.types.label") %></legend>
+      <div class="filter-checkboxes">
+        <% FeedQuery::TYPES.each do |type| %>
+          <label class="filter-checkbox">
+            <input type="checkbox" name="types[]" value="<%= type %>"
+              <%= "checked" if @query.types.include?(type) %>>
+            <%= t("feed.types.#{type}") %>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
+
+    <% unless @tag.present? %>
+      <fieldset class="filter-fieldset">
+        <legend class="eyebrow"><%= t("feed.tag_filter.label") %></legend>
+        <select name="tag" class="filter-select">
+          <option value=""><%= t("feed.tag_filter.label") %></option>
+          <% Tag.active.order(:name).each do |tag| %>
+            <option value="<%= tag.slug %>"<%= " selected" if @query.tag_slug == tag.slug %>>
+              <%= tag.name %>
+            </option>
+          <% end %>
+        </select>
+      </fieldset>
+    <% end %>
+
+    <button type="submit" class="button"><%= t("feed.filters.apply") %></button>
+  </form>
+</div>

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bundle install
+bin/rails db:prepare
+
+if [ "${RAILS_ENV:-development}" = "development" ]; then
+  RAILS_ENV=test bin/rails db:prepare
+fi

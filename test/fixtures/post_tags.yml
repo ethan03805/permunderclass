@@ -1,0 +1,7 @@
+shipped_tagging:
+  post: commented_post
+  tag: active_tag
+
+removed_tagging:
+  post: removed_post
+  tag: active_tag

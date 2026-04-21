@@ -1,0 +1,52 @@
+<% content_for :title, page_title(t("auth.sign_up.title")) %>
+
+<% if turnstile_site_key.present? %>
+  <% content_for :head do %>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <% end %>
+<% end %>
+
+<section class="auth-shell" aria-labelledby="sign-up-title">
+  <p class="eyebrow"><%= t("auth.sign_up.eyebrow") %></p>
+  <h1 id="sign-up-title" class="hero__title auth-shell__title"><%= t("auth.sign_up.title") %></h1>
+  <p class="lede"><%= t("auth.sign_up.intro") %></p>
+
+  <div class="form-shell">
+    <%= render "shared/form_errors", object: @user %>
+
+    <%= form_with model: @user, url: sign_up_path, class: "form-stack" do |form| %>
+      <div class="field-group">
+        <%= form.label :pseudonym, t("auth.fields.pseudonym") %>
+        <%= form.text_field :pseudonym, autocomplete: "nickname", required: true %>
+        <p class="field-hint"><%= t("auth.sign_up.pseudonym_hint") %></p>
+      </div>
+
+      <div class="field-group">
+        <%= form.label :email, t("auth.fields.email") %>
+        <%= form.email_field :email, autocomplete: "email", required: true %>
+      </div>
+
+      <div class="field-group">
+        <%= form.label :password, t("auth.fields.password") %>
+        <%= form.password_field :password, autocomplete: "new-password", required: true %>
+      </div>
+
+      <div class="field-group">
+        <%= form.label :password_confirmation, t("auth.fields.password_confirmation") %>
+        <%= form.password_field :password_confirmation, autocomplete: "new-password", required: true %>
+      </div>
+
+      <% if turnstile_site_key.present? %>
+        <div class="field-group">
+          <div class="cf-turnstile" data-sitekey="<%= turnstile_site_key %>"></div>
+        </div>
+      <% end %>
+
+      <div class="actions-row">
+        <%= form.submit t("auth.sign_up.submit"), class: "button" %>
+      </div>
+    <% end %>
+
+    <p class="supporting-copy"><%= t("auth.sign_up.supporting_copy_html", sign_in_path: sign_in_path) %></p>
+  </div>
+</section>

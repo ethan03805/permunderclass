@@ -1,0 +1,10 @@
+<header class="site-header">
+  <div class="site-frame site-header__inner">
+    <div class="site-header__brand">
+      <%= link_to t("app.name"), root_path, class: "site-title" %>
+      <p class="site-header__summary"><%= t("header.summary") %></p>
+    </div>
+
+    <%= render "shared/site_nav" %>
+  </div>
+</header>

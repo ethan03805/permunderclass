@@ -1,0 +1,27 @@
+<% content_for :title, page_title(t("auth.password_reset.edit.title")) %>
+
+<section class="auth-shell" aria-labelledby="password-reset-edit-title">
+  <p class="eyebrow"><%= t("auth.password_reset.edit.eyebrow") %></p>
+  <h1 id="password-reset-edit-title" class="hero__title auth-shell__title"><%= t("auth.password_reset.edit.title") %></h1>
+  <p class="lede"><%= t("auth.password_reset.edit.intro") %></p>
+
+  <div class="form-shell">
+    <%= render "shared/form_errors", object: @user %>
+
+    <%= form_with model: @user, url: password_reset_token_path(token: @token), method: :patch, class: "form-stack" do |form| %>
+      <div class="field-group">
+        <%= form.label :password, t("auth.fields.password") %>
+        <%= form.password_field :password, autocomplete: "new-password", required: true %>
+      </div>
+
+      <div class="field-group">
+        <%= form.label :password_confirmation, t("auth.fields.password_confirmation") %>
+        <%= form.password_field :password_confirmation, autocomplete: "new-password", required: true %>
+      </div>
+
+      <div class="actions-row">
+        <%= form.submit t("auth.password_reset.edit.submit"), class: "button" %>
+      </div>
+    <% end %>
+  </div>
+</section>

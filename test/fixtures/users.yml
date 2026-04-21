@@ -1,0 +1,62 @@
+pending_member:
+  pseudonym: pending_builder
+  email: pending@example.com
+  password_digest: <%= BCrypt::Password.create("password123") %>
+  role: member
+  state: pending_email_verification
+  email_verified_at:
+  reply_alerts_enabled: true
+
+active_member:
+  pseudonym: active_builder
+  email: active@example.com
+  password_digest: <%= BCrypt::Password.create("password123") %>
+  role: member
+  state: active
+  email_verified_at: <%= 2.days.ago %>
+  reply_alerts_enabled: true
+
+suspended_member:
+  pseudonym: suspended_builder
+  email: suspended@example.com
+  password_digest: <%= BCrypt::Password.create("password123") %>
+  role: member
+  state: suspended
+  email_verified_at: <%= 3.days.ago %>
+  reply_alerts_enabled: true
+
+banned_member:
+  pseudonym: banned_builder
+  email: banned@example.com
+  password_digest: <%= BCrypt::Password.create("password123") %>
+  role: member
+  state: banned
+  email_verified_at: <%= 4.days.ago %>
+  reply_alerts_enabled: false
+
+moderator:
+  pseudonym: mod_builder
+  email: mod@example.com
+  password_digest: <%= BCrypt::Password.create("password123") %>
+  role: moderator
+  state: active
+  email_verified_at: <%= 5.days.ago %>
+  reply_alerts_enabled: true
+
+another_active:
+  pseudonym: another_builder
+  email: another@example.com
+  password_digest: <%= BCrypt::Password.create("password123") %>
+  role: member
+  state: active
+  email_verified_at: <%= 1.day.ago %>
+  reply_alerts_enabled: true
+
+admin:
+  pseudonym: admin_builder
+  email: admin@example.com
+  password_digest: <%= BCrypt::Password.create("password123") %>
+  role: admin
+  state: active
+  email_verified_at: <%= 6.days.ago %>
+  reply_alerts_enabled: true

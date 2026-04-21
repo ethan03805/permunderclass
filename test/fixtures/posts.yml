@@ -1,0 +1,75 @@
+commented_post:
+  user: active_member
+  post_type: discussion
+  title: "My shipped product"
+  body: "This is the body of my shipped post."
+  status: published
+  published_at: <%= 1.day.ago %>
+  upvote_count: 0
+  downvote_count: 0
+  score: 0
+  comment_count: 2
+  hot_score: 0.0
+  report_count: 1
+  linter_flags: []
+
+build_post:
+  user: active_member
+  post_type: discussion
+  title: "My build"
+  body: "Building something new."
+  status: published
+  published_at: <%= 2.days.ago %>
+  upvote_count: 0
+  downvote_count: 0
+  score: 0
+  comment_count: 0
+  hot_score: 0.0
+  report_count: 0
+  linter_flags: []
+
+discussion_post:
+  user: moderator
+  post_type: discussion
+  title: "A discussion"
+  body: "What do you think about this?"
+  status: published
+  published_at: <%= 3.days.ago %>
+  upvote_count: 0
+  downvote_count: 0
+  score: 0
+  comment_count: 0
+  hot_score: 0.0
+  report_count: 0
+  linter_flags: []
+
+rewrite_requested_post:
+  user: active_member
+  post_type: discussion
+  title: "Needs rewrite"
+  body: "This post needs a rewrite."
+  status: rewrite_requested
+  published_at: <%= 4.days.ago %>
+  upvote_count: 1
+  downvote_count: 0
+  score: 1
+  comment_count: 0
+  hot_score: 0.0
+  report_count: 0
+  linter_flags: []
+  rewrite_reason: "Please add more detail."
+
+removed_post:
+  user: active_member
+  post_type: discussion
+  title: "Removed post"
+  body: "This post has been removed from listings."
+  status: removed
+  published_at: <%= 5.days.ago %>
+  upvote_count: 2
+  downvote_count: 1
+  score: 1
+  comment_count: 0
+  hot_score: 0.0
+  report_count: 0
+  linter_flags: []

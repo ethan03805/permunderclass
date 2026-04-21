@@ -1,0 +1,7 @@
+<%= t("mailers.user_mailer.email_verification.greeting", pseudonym: @user.pseudonym) %>
+
+<%= t("mailers.user_mailer.email_verification.body") %>
+
+<%= @verification_url %>
+
+<%= t("mailers.user_mailer.email_verification.expiry") %>

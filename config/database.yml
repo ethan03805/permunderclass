@@ -1,0 +1,37 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  primary: &development_primary
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_URL") { "postgresql://postgres:postgres@db:5432/permanent_underclass_development" } %>
+  cache:
+    <<: *development_primary
+    database_tasks: false
+  queue:
+    <<: *development_primary
+    database_tasks: false
+
+test:
+  primary: &test_primary
+    <<: *default
+    url: <%= ENV.fetch("TEST_DATABASE_URL") { "postgresql://postgres:postgres@db:5432/permanent_underclass_test" } %>
+  cache:
+    <<: *test_primary
+    database_tasks: false
+  queue:
+    <<: *test_primary
+    database_tasks: false
+
+production:
+  primary: &primary_production
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_URL") %>
+  cache:
+    <<: *primary_production
+    database_tasks: false
+  queue:
+    <<: *primary_production
+    database_tasks: false

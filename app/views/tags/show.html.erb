@@ -1,0 +1,21 @@
+<% content_for :title, page_title(t("tags.title", name: @tag.name)) %>
+
+<div class="feed-layout">
+  <h1 class="section-title"><%= t("tags.title", name: @tag.name) %></h1>
+
+  <%= render "shared/feed_filters" %>
+
+  <% if @posts.any? %>
+    <ul class="post-list" role="list">
+      <% @posts.each do |post| %>
+        <li>
+          <%= render "shared/post_card", post: post %>
+        </li>
+      <% end %>
+    </ul>
+
+    <%= render "shared/pagination", result: @result %>
+  <% else %>
+    <p class="feed-empty"><%= t("tags.empty") %></p>
+  <% end %>
+</div>

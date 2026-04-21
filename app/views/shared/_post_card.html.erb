@@ -1,0 +1,27 @@
+<article class="post-card">
+  <h3 class="post-card__title">
+    <%= link_to post.title, post_permalink_path(post) %>
+  </h3>
+
+  <p class="post-card__meta">
+    <span class="eyebrow"><%= t("post_types.#{post.post_type}") %></span>
+    <span><%= post.user.pseudonym %></span>
+    <time datetime="<%= post.published_at.iso8601 %>"><%= l(post.published_at, format: :short) %></time>
+  </p>
+
+  <p class="post-card__stats">
+    <%= t("feed.score", count: post.score, score: post.score) %>
+    <span class="post-card__divider" aria-hidden="true">·</span>
+    <%= t("feed.comments", count: post.comment_count) %>
+  </p>
+
+  <% if post.tags.any? %>
+    <ul class="post-card__tags" role="list">
+      <% post.tags.each do |tag| %>
+        <li>
+          <%= link_to tag.name, tag_path(tag.slug) %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</article>

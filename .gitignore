@@ -1,0 +1,28 @@
+/.bundle
+/coverage
+/log/*
+!/log/.keep
+/storage/*
+!/storage/.keep
+/tmp/*
+!/tmp/.keep
+!/tmp/pids/
+!/tmp/pids/.keep
+!/tmp/storage/
+!/tmp/storage/.keep
+/vendor/bundle
+
+# Ignore master key for decrypting credentials and more.
+/config/master.key
+
+# Ignore local environment files.
+/.env
+/.env.*
+!.env.example
+
+# Ignore local databases and dumps.
+/*.sqlite3
+/*.sqlite3-journal
+
+# Ignore macOS system files.
+.DS_Store

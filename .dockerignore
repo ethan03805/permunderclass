@@ -1,0 +1,10 @@
+.git
+.github
+.bundle
+log/*
+tmp/*
+storage/*
+vendor/bundle
+coverage
+.DS_Store
+docs

@@ -1,0 +1,32 @@
+<nav class="site-nav" aria-label="<%= t("nav.primary") %>">
+  <ul class="site-nav__list" role="list">
+    <li>
+      <%= link_to t("nav.home"), root_path, class: nav_link_class(root_path) %>
+    </li>
+
+    <% if current_user.present? %>
+      <li class="site-nav__status">
+        <span class="eyebrow"><%= t("nav.account_label") %></span>
+        <span><%= current_user.pseudonym %></span>
+      </li>
+      <li class="site-nav__status">
+        <span class="eyebrow"><%= t("nav.account_state_label") %></span>
+        <span><%= t("nav.account_states.#{current_user.state}") %></span>
+      </li>
+      <li>
+        <%= button_to t("nav.sign_out"), sign_out_path, method: :delete, class: "site-nav__button" %>
+      </li>
+    <% else %>
+      <li>
+        <%= link_to t("nav.sign_in"), sign_in_path, class: nav_link_class(sign_in_path) %>
+      </li>
+      <li>
+        <%= link_to t("nav.sign_up"), sign_up_path, class: nav_link_class(sign_up_path) %>
+      </li>
+      <li class="site-nav__status">
+        <span class="eyebrow"><%= t("nav.availability_label") %></span>
+        <span><%= t("nav.availability_value") %></span>
+      </li>
+    <% end %>
+  </ul>
+</nav>

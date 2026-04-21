@@ -1,0 +1,4 @@
+post_vote_up:
+  user: another_active
+  post: rewrite_requested_post
+  value: 1

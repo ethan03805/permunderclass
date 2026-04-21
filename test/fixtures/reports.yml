@@ -1,0 +1,13 @@
+open_post_report:
+  reporter: another_active
+  target: commented_post (Post)
+  reason_code: spam
+  status: open
+
+resolved_comment_report:
+  reporter: active_member
+  target: top_comment (Comment)
+  reason_code: abuse
+  status: resolved
+  resolved_by: moderator
+  resolved_at: <%= 1.hour.ago %>

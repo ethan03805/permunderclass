@@ -1,0 +1,12 @@
+<% if object.errors.any? %>
+  <div class="error-summary" aria-live="polite">
+    <p class="eyebrow"><%= t("forms.errors.eyebrow") %></p>
+    <h2 class="section-title"><%= t("forms.errors.title", count: object.errors.count) %></h2>
+
+    <ul class="error-summary__list" role="list">
+      <% object.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

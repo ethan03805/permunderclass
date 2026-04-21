@@ -1,0 +1,20 @@
+<% content_for :title, page_title(t("feed.title")) %>
+<% content_for :meta_description, t("feed.description") %>
+
+<div class="feed-layout">
+  <%= render "shared/feed_filters" %>
+
+  <% if @posts.any? %>
+    <ul class="post-list" role="list">
+      <% @posts.each do |post| %>
+        <li>
+          <%= render "shared/post_card", post: post %>
+        </li>
+      <% end %>
+    </ul>
+
+    <%= render "shared/pagination", result: @result %>
+  <% else %>
+    <p class="feed-empty"><%= t("feed.empty") %></p>
+  <% end %>
+</div>

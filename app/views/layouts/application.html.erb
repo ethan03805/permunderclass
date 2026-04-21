@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <meta charset="utf-8">
+    <title><%= content_for(:title) || t("app.title") %></title>
+    <meta name="description" content="<%= content_for?(:meta_description) ? content_for(:meta_description) : t("app.description") %>">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="<%= t("app.name") %>">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main-content"><%= t("layouts.skip_to_content") %></a>
+
+    <div class="site-shell">
+      <%= render "shared/header" %>
+
+      <main id="main-content" class="site-main">
+        <div class="site-frame site-main__inner">
+          <%= render "shared/flash" %>
+          <%= yield %>
+        </div>
+      </main>
+
+      <%= render "shared/footer" %>
+    </div>
+  </body>
+</html>

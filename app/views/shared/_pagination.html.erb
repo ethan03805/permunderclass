@@ -1,0 +1,15 @@
+<% if result[:total_pages] > 1 %>
+  <nav class="pagination" aria-label="<%= t("feed.pagination.page", page: result[:page], total_pages: result[:total_pages]) %>">
+    <% if result[:page] > 1 %>
+      <%= link_to t("feed.pagination.previous"), feed_params_for(page: result[:page] - 1), class: "pagination__link" %>
+    <% end %>
+
+    <span class="pagination__current">
+      <%= t("feed.pagination.page", page: result[:page], total_pages: result[:total_pages]) %>
+    </span>
+
+    <% if result[:page] < result[:total_pages] %>
+      <%= link_to t("feed.pagination.next"), feed_params_for(page: result[:page] + 1), class: "pagination__link" %>
+    <% end %>
+  </nav>
+<% end %>
