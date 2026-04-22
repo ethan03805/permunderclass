@@ -38,11 +38,11 @@ en:
   app:
     name: "permanentunderclass.me"
     title: "permanentunderclass.me"
-    description: "A restrained community site for pseudonymous builders."
+    description: "Posts from pseudonymous builders sharing shipped work, work in progress, and discussion."
   layouts:
     skip_to_content: "Skip to main content"
   header:
-    summary: "A restrained community site for pseudonymous builders."
+    summary: "Posts from pseudonymous builders."
   nav:
     primary: "Primary navigation"
     home: "Home"
@@ -53,56 +53,25 @@ en:
     sign_up: "Create account"
     account_label: "Account"
     account_state_label: "State"
-    availability_label: "Status"
-    availability_value: "The feed is live. Submission routes will appear as later packages are completed."
+    availability_label: "Access"
+    availability_value: "Read without an account. Create one and verify your email to post, comment, or vote."
     account_states:
       active: "Active"
       pending_email_verification: "Pending email verification"
       suspended: "Suspended"
       banned: "Banned"
-  home:
-    eyebrow: "Application shell"
-    title: "A restrained starting point"
-    description: "Shared layout, responsive structure, and locale-backed placeholder copy for permanentunderclass.me."
-    intro: "The base layout, shared navigation, footer, design tokens, and copy registry are in place. Account creation, sign-in, email verification, and password reset now share the same shell. Feed and submission flows will be added next."
-    sections:
-      overview:
-        title: "Current surface"
-        body: "The shell is intentionally simple. Spacing, borders, and type hierarchy carry the layout instead of decorative components."
-      features:
-        shell:
-          title: "Shared layout"
-          body: "Header, navigation, main content, and footer now render from one responsive application shell."
-        access:
-          title: "Planned access model"
-          body: "Browsing remains open. Account creation and sign-in are available now. Posting, commenting, and voting will remain gated behind verified accounts when those features arrive."
-        progression:
-          title: "Incremental delivery"
-          body: "The interface is prepared for future feed, authentication, submission, profile, and moderation screens without changing the visual rules."
-    registry:
-      title: "Copy registry"
-      body: "Visible interface copy is centralized in locale files from the start so later features can extend the same structure."
-      items:
-        layout: "Base layout strings live in the locale registry."
-        navigation: "Shared header, navigation, and footer labels live in the locale registry."
-        tokens: "Design tokens define colors, spacing, type, and responsive width scales."
-        copy: "Placeholder copy stays generic and functional until a formal voice document exists."
   footer:
-    current_state:
-      eyebrow: "Current state"
-      title: "Application shell"
-      body: "The site now has a stable frame for future pages and flows."
-    copy_registry:
-      eyebrow: "Content"
-      title: "Centralized strings"
-      body: "User-facing copy is served from locale files so new packages extend one shared registry."
-    constraints:
-      eyebrow: "Constraints"
-      title: "Visual rules"
-      body: "The interface stays text-first, responsive, and restrained, with underlined links and no shadows or gradients."
+    site:
+      eyebrow: "Site"
+      title: "Using the site"
+      body: "Browse without an account. Create one and verify your email before posting, commenting, or voting."
+    posts:
+      eyebrow: "Posts"
+      title: "What to post"
+      body: "Use posts for shipped work, work in progress, or a focused discussion."
     pages:
       eyebrow: "Pages"
-      title: "Reference"
+      title: "More information"
       links:
         about: "About"
         rules: "Rules"
@@ -246,18 +215,20 @@ en:
     about:
       eyebrow: "About"
       title: "About"
-      description: "What this site is for."
-      intro: "This site is a restrained place for pseudonymous builders to share what they are making."
+      description: "What the site is for and how to use it."
+      intro: "Use this site to share shipped work, work in progress, or a focused discussion about building a product."
       sections:
-        - title: "What belongs here"
-          body: "Use posts to share shipped work, work in progress, or concrete discussion prompts related to building a product."
-        - title: "What the product is optimizing for"
-          body: "The product aims for plain language, pseudonymous participation, and a low-drama environment instead of launch theatrics."
+        - title: "What to post"
+          body: "Share launched work, work in progress, or a specific question that helps other builders respond clearly."
+        - title: "Who it is for"
+          body: "The site is for indie, solo, and bootstrapped builders who want a simple public record of what they are making."
+        - title: "How participation works"
+          body: "Browsing is open. Create an account and verify your email before posting, commenting, or voting."
     rules:
       eyebrow: "Rules"
       title: "Rules"
       description: "Baseline participation rules."
-      intro: "The rules are intentionally short in v1 and may expand later."
+      intro: "These are the basic rules for posting and commenting."
       sections:
         - title: "Baseline"
           items:
@@ -268,39 +239,51 @@ en:
     faq:
       eyebrow: "FAQ"
       title: "FAQ"
-      description: "Basic answers about how the site works."
-      intro: "These answers are generic placeholders until the site is closer to launch."
+      description: "Short answers about how the site works."
+      intro: "These answers cover the basics."
       sections:
         - title: "Do I need an account to read?"
           body: "No. Browsing is open."
         - title: "Do I need an account to post, comment, or vote?"
-          body: "Yes. Posting, commenting, and voting require an account."
+          body: "Yes. Create an account and verify your email before posting, commenting, or voting."
         - title: "Do I need to use my real name?"
           body: "No. Public identity is pseudonymous by default."
+        - title: "What can I post?"
+          body: "Use posts for shipped work, work in progress, or a focused discussion prompt."
     privacy:
       eyebrow: "Privacy"
       title: "Privacy"
-      description: "A generic placeholder privacy page."
-      intro: "This placeholder will be replaced with launch-ready copy before the site is public."
+      description: "How account information and public activity are handled."
+      intro: "This page summarizes the information the site needs to run."
       sections:
-        - title: "What is true in v1"
+        - title: "What we collect"
           items:
-            - "No third-party tracking scripts are planned for the site."
-            - "Browsing is open, but posting, commenting, and voting require an account."
-            - "Operational analytics are expected to come from server-side logs and infrastructure metrics."
-        - title: "Before launch"
-          body: "The full privacy notice still needs a legal and policy review before launch."
+            - "Your email address and the account details needed to sign you in."
+            - "Your pseudonym, posts, comments, votes, reports, and uploaded media."
+            - "Basic server logs and infrastructure metrics used to operate the site."
+        - title: "What is public"
+          items:
+            - "Your pseudonym, profile history, posts, and comments are visible to other visitors."
+            - "Browsing does not require an account."
+        - title: "What we do not use"
+          items:
+            - "No third-party tracking scripts are used on the site."
+            - "The site does not require your real name or phone number."
     terms:
       eyebrow: "Terms"
       title: "Terms"
-      description: "A generic placeholder terms page."
-      intro: "This placeholder sets expectations at a high level until final legal copy is ready."
+      description: "Basic conditions for using the service."
+      intro: "These terms explain the basic conditions for using the site."
       sections:
-        - title: "Service expectations"
+        - title: "Using the service"
           items:
-            - "The service may change, pause, or remove content as part of moderation or maintenance."
-            - "Accounts may be suspended or banned for rule violations."
-            - "Final legal terms still need review before launch."
+            - "You are responsible for the content you post and the files you upload."
+            - "Do not post spam, harassment, illegal content, or anything you do not have permission to share."
+            - "Do not try to avoid suspensions, bans, or other moderation actions."
+        - title: "Moderation and availability"
+          items:
+            - "Posts, comments, and accounts may be limited or removed when rules are broken."
+            - "The service may change, pause, or be unavailable during maintenance or moderation review."
   post_types:
     shipped: "Shipped"
     build: "Build"
@@ -352,13 +335,13 @@ en:
       submit_update: "Save changes"
     preview:
       eyebrow: "Preview"
-      title: "Saved output preview"
-      empty_title: "Your title appears here."
-      empty_body: "Your post body appears here."
-      no_tags: "No tags selected yet."
-      link_placeholder: "Link preview"
-      build_status_placeholder: "Build status appears here."
-      media_placeholder: "Media preview appears after you select an image or video."
+      title: "Post preview"
+      empty_title: "Add a title to preview it here."
+      empty_body: "Add a short description to preview it here."
+      no_tags: "No tags selected."
+      link_placeholder: "Add a link to preview it here."
+      build_status_placeholder: "Choose a build status."
+      media_placeholder: "Add an image or video to preview it here."
     style_guide:
       eyebrow: "Style guide"
       title: "Keep it plain"

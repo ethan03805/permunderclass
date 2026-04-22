@@ -14,7 +14,13 @@ class HomePageTest < ActionDispatch::IntegrationTest
     assert_select "nav.site-nav[aria-label=?]", I18n.t("nav.primary")
     assert_select "main#main-content", 1
     assert_select "footer.site-footer", 1
+    assert_select "footer .site-footer__section", 3
     assert_select "a.site-title", I18n.t("app.name")
+    assert_select "footer a[href=?]", about_path
+    assert_select "footer a[href=?]", rules_path
+    assert_select "footer a[href=?]", faq_path
+    assert_select "footer a[href=?]", privacy_path
+    assert_select "footer a[href=?]", terms_path
     assert_select ".feed-layout", 1
   end
 end
