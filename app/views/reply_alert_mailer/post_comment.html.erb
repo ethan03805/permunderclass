@@ -1,0 +1,8 @@
+<p><%= t("mailers.reply_alert_mailer.shared.greeting", pseudonym: @recipient.pseudonym) %></p>
+
+<p><%= t("mailers.reply_alert_mailer.post_comment.body", author: @comment_author.pseudonym, title: @post.title) %></p>
+
+<p><strong><%= t("mailers.reply_alert_mailer.shared.comment_label") %></strong></p>
+<p><%= @comment.body %></p>
+
+<p><%= link_to t("mailers.reply_alert_mailer.shared.cta"), @comment_url %></p>

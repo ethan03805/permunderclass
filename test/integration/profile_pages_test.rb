@@ -56,6 +56,17 @@ class ProfilePagesTest < ActionDispatch::IntegrationTest
     assert_select ".activity-item", text: /#{Regexp.escape(posts(:removed_post).title)}/
   end
 
+  test "profile owners can update reply alert preferences" do
+    sign_in_as(users(:active_member))
+
+    patch profile_preferences_path(users(:active_member).pseudonym), params: {
+      user: { reply_alerts_enabled: "0" }
+    }
+
+    assert_redirected_to profile_path(users(:active_member).pseudonym, anchor: "profile-preferences")
+    assert_not users(:active_member).reload.reply_alerts_enabled?
+  end
+
   test "static pages render from locale content" do
     {
       about_path => I18n.t("static_pages.about.title"),

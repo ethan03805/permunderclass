@@ -30,6 +30,7 @@
       class: "submit-grid" do |form| %>
       <div class="form-shell">
         <%= render "shared/form_errors", object: post %>
+        <%= render "shared/spam_protection_fields", context: :submit unless post.persisted? %>
 
         <% unless post.persisted? %>
           <%= form.hidden_field :post_type, value: post.post_type %>

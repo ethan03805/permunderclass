@@ -7,12 +7,30 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
-  helper_method :turnstile_site_key
+  helper_method :turnstile_site_key, :spam_protection_form_token
 
   private
 
   def turnstile_site_key
     ENV.fetch("TURNSTILE_SITE_KEY", "").presence
+  end
+
+  def spam_protection_form_token(context)
+    SpamCheck.form_token_for(context)
+  end
+
+  def enable_anonymous_edge_cache!(max_age: 60, shared_max_age: 300)
+    return unless request.get? && current_user.blank? && response.successful?
+
+    response.headers["Cache-Control"] = "public, max-age=#{max_age}, s-maxage=#{shared_max_age}, stale-while-revalidate=30"
+  end
+
+  def spam_check_result_for(context)
+    SpamCheck.new(
+      context: context,
+      honeypot_value: spam_check_params[:website],
+      form_started_token: spam_check_params[:form_started_token]
+    ).call
   end
 
   def redirect_to_safe_return_path(fallback_location, anchor: nil, **options)
@@ -28,5 +46,9 @@ class ApplicationController < ActionController::Base
     return if !path.start_with?("/") || path.start_with?("//") || path.include?("\n")
 
     path
+  end
+
+  def spam_check_params
+    params.fetch(:spam_check, {}).permit(:website, :form_started_token)
   end
 end

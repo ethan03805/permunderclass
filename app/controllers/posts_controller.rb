@@ -1,4 +1,6 @@
 class PostsController < ApplicationController
+  after_action :set_anonymous_cache_headers, only: :show
+
   before_action :require_verified_user!, except: :show
   before_action :set_post, only: [ :show, :edit, :update ]
   before_action :set_available_tags, only: [ :new, :create, :edit, :update ]
@@ -15,8 +17,14 @@ class PostsController < ApplicationController
 
     @selected_tag_ids = filtered_tag_ids
     @post = current_user.posts.build(post_params.except(:tag_ids))
+    spam_check_result = spam_check_result_for(:submit)
     mirror_linter_flags
     selected_tags = selected_tags_for_assignment
+
+    unless spam_check_result.allowed?
+      @post.errors.add(:base, spam_check_result.error_key)
+      return render :new, status: :unprocessable_entity
+    end
 
     if @selected_tag_ids.size > Post::MAX_TAGS
       @post.errors.add(:tags, :too_many)
@@ -131,5 +139,9 @@ class PostsController < ApplicationController
   def restore_rewrite_requested_state(original_rewrite_reason)
     @post.status = :rewrite_requested
     @post.rewrite_reason = original_rewrite_reason
+  end
+
+  def set_anonymous_cache_headers
+    enable_anonymous_edge_cache!
   end
 end

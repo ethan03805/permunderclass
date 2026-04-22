@@ -1,0 +1,8 @@
+<%= t("mailers.reply_alert_mailer.shared.greeting", pseudonym: @recipient.pseudonym) %>
+
+<%= t("mailers.reply_alert_mailer.post_comment.body", author: @comment_author.pseudonym, title: @post.title) %>
+
+<%= t("mailers.reply_alert_mailer.shared.comment_label") %>
+<%= @comment.body %>
+
+<%= @comment_url %>

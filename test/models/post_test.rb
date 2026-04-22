@@ -209,6 +209,8 @@ class PostTest < ActiveSupport::TestCase
   end
 
   test "video validation accepts short h264 mp4 files" do
+    skip "ffprobe is not available" unless ffprobe_available?
+
     post = Post.new(user: users(:active_member), post_type: :build, title: "Build", body: "Body", build_status: :sharing)
     post.video.attach(uploaded_mp4(filename: "valid-h264.mp4", duration: 1, codec: "libx264"))
 
@@ -216,6 +218,8 @@ class PostTest < ActiveSupport::TestCase
   end
 
   test "video validation rejects non-h264 mp4 files" do
+    skip "ffprobe is not available" unless ffprobe_available?
+
     post = Post.new(user: users(:active_member), post_type: :build, title: "Build", body: "Body", build_status: :sharing)
     post.video.attach(uploaded_mp4(filename: "invalid-codec.mp4", duration: 1, codec: "mpeg4"))
 
@@ -224,6 +228,8 @@ class PostTest < ActiveSupport::TestCase
   end
 
   test "video validation rejects clips longer than 30 seconds" do
+    skip "ffprobe is not available" unless ffprobe_available?
+
     post = Post.new(user: users(:active_member), post_type: :build, title: "Build", body: "Body", build_status: :sharing)
     post.video.attach(uploaded_mp4(filename: "too-long.mp4", duration: 31, codec: "libx264"))
 

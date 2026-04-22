@@ -152,6 +152,13 @@ en:
     title: "%{pseudonym}"
     description: "Posts and comments from %{pseudonym}."
     intro: "A minimal public history of posts and comments."
+    preferences:
+      eyebrow: "Preferences"
+      title: "Email alerts"
+      intro: "Choose whether replies to your comments and new comments on your posts should send email."
+      reply_alerts_enabled: "Send reply alert emails"
+      submit: "Save preferences"
+      updated: "Your email alert preferences have been updated."
     filters:
       activity_label: "Profile history"
       posts: "Posts"
@@ -579,6 +586,21 @@ en:
         body: "Use the link below to choose a new password."
         cta: "Reset password"
         expiry: "This link expires in 30 minutes."
+    reply_alert_mailer:
+      shared:
+        greeting: "Hello %{pseudonym},"
+        comment_label: "New comment"
+        cta: "View comment"
+      comment_reply:
+        subject: "New reply to your comment"
+        body: "%{author} replied to your comment on \"%{title}\"."
+      post_comment:
+        subject: "New comment on your post"
+        body: "%{author} commented on your post \"%{title}\"."
+  spam_protection:
+    honeypot_label: "Leave this field blank"
+  rate_limits:
+    exceeded: "Too many requests. Please wait and try again."
   activerecord:
     models:
       user: "Account"
@@ -622,9 +644,13 @@ en:
         user:
           attributes:
             base:
+              honeypot_triggered: "That submission could not be accepted."
+              submission_token_invalid: "Please try submitting the form again."
+              submitted_too_quickly: "That form was submitted too quickly. Please try again."
               turnstile_failed: "Turnstile verification could not be completed."
             email:
               blank: "must be present"
+              disposable: "must use a non-disposable email address"
               invalid: "must be a valid email address"
               taken: "is already in use"
             password:
@@ -647,6 +673,10 @@ en:
               taken: "is already in use"
         post:
           attributes:
+            base:
+              honeypot_triggered: "That submission could not be accepted."
+              submission_token_invalid: "Please try submitting the form again."
+              submitted_too_quickly: "That form was submitted too quickly. Please try again."
             title:
               blank: "must be present"
               too_long: "must be %{count} characters or fewer"

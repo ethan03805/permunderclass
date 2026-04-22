@@ -57,15 +57,20 @@ Rails.application.configure do
     host: ENV.fetch("APP_HOST", "example.com"),
     protocol: "https"
   }
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = true
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  smtp_settings = {
+    address: ENV.fetch("SMTP_ADDRESS", nil).presence,
+    authentication: :plain,
+    domain: ENV.fetch("SMTP_DOMAIN", nil).presence,
+    enable_starttls_auto: true,
+    password: ENV.fetch("SMTP_PASSWORD", nil).presence,
+    port: ENV.fetch("SMTP_PORT", "587").to_i,
+    user_name: ENV.fetch("SMTP_USERNAME", nil).presence
+  }.compact
+
+  config.action_mailer.smtp_settings = smtp_settings if smtp_settings[:address].present?
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

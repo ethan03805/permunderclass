@@ -8,15 +8,18 @@ class SessionsController < ApplicationController
     user = User.authenticate_by(email: session_params[:email].to_s.strip.downcase, password: session_params[:password])
 
     if user.nil?
+      LoginFailureTracker.track(request.remote_ip)
       redirect_to sign_in_path, alert: t("auth.sign_in.invalid_credentials")
       return
     end
 
     if user.suspended? || user.banned?
+      LoginFailureTracker.track(request.remote_ip)
       redirect_to sign_in_path, alert: blocked_user_message(user)
       return
     end
 
+    LoginFailureTracker.reset(request.remote_ip)
     start_session_for(user)
     redirect_to root_path, notice: sign_in_notice_for(user)
   end

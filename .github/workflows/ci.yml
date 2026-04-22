@@ -6,9 +6,17 @@ on:
       - main
   pull_request:
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   app:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     services:
       postgres:
         image: postgres:16
@@ -23,8 +31,11 @@ jobs:
           --health-timeout=5s
           --health-retries=5
     env:
+      CI: "true"
       RAILS_ENV: test
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/permanent_underclass_test
       TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/permanent_underclass_test
+      PARALLEL_WORKERS: "1"
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -36,7 +47,7 @@ jobs:
           ruby-version-file: .ruby-version
 
       - name: Install native build dependencies
-        run: sudo apt-get update && sudo apt-get install -y libpq-dev libyaml-dev
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg libpq-dev libyaml-dev
 
       - name: Prepare database
         run: bin/setup

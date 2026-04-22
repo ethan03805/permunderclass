@@ -240,6 +240,7 @@ class Post < ApplicationRecord
 
   def video_attachment_rules
     return unless video.attached?
+    return if post_type_build? && effective_image_attached? && effective_video_attached?
 
     if video.blob.byte_size > MAX_VIDEO_SIZE
       errors.add(:video, :too_large)
@@ -253,10 +254,10 @@ class Post < ApplicationRecord
 
     metadata = if pending_video_upload_path.present?
       VideoMetadata.inspect(pending_video_upload_path)
-    elsif attachment_changes["video"].present?
-      VideoMetadata::Result.new(available: false)
-    else
+    elsif video.attached? && video.blob.present?
       VideoMetadata.inspect(video.blob)
+    else
+      VideoMetadata::Result.new(available: false)
     end
     unless metadata.available?
       errors.add(:video, :uninspectable)

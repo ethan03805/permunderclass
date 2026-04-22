@@ -22,7 +22,7 @@ class SignUpFlowTest < ActionDispatch::IntegrationTest
           password_confirmation: "password123",
           pseudonym: "new_builder"
         }
-      }
+      }.merge(spam_check_params(:sign_up))
     end
 
     user = User.order(:id).last
@@ -46,7 +46,7 @@ class SignUpFlowTest < ActionDispatch::IntegrationTest
           password_confirmation: "different",
           pseudonym: "bad name"
         }
-      }
+      }.merge(spam_check_params(:sign_up))
     end
 
     assert_response :unprocessable_entity
@@ -63,11 +63,59 @@ class SignUpFlowTest < ActionDispatch::IntegrationTest
             password_confirmation: "password123",
             pseudonym: "blocked_builder"
           }
-        }
+        }.merge(spam_check_params(:sign_up))
       end
     end
 
     assert_response :unprocessable_entity
     assert_select ".error-summary", text: /#{Regexp.escape(I18n.t("activerecord.errors.models.user.attributes.base.turnstile_failed"))}/
+  end
+
+  test "POST /sign-up blocks disposable email domains" do
+    assert_no_difference("User.count") do
+      post sign_up_path, params: {
+        user: {
+          email: "throwaway@mailinator.com",
+          password: "password123",
+          password_confirmation: "password123",
+          pseudonym: "temporary_builder"
+        }
+      }.merge(spam_check_params(:sign_up))
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".error-summary", text: /#{Regexp.escape(I18n.t("activerecord.errors.models.user.attributes.email.disposable"))}/
+  end
+
+  test "POST /sign-up blocks honeypot submissions" do
+    assert_no_difference("User.count") do
+      post sign_up_path, params: {
+        user: {
+          email: "honeypot@example.com",
+          password: "password123",
+          password_confirmation: "password123",
+          pseudonym: "honeypot_builder"
+        }
+      }.merge(spam_check_params(:sign_up, honeypot: "https://spam.example"))
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".error-summary", text: /#{Regexp.escape(I18n.t("activerecord.errors.models.user.attributes.base.honeypot_triggered"))}/
+  end
+
+  test "POST /sign-up blocks forms submitted too quickly" do
+    assert_no_difference("User.count") do
+      post sign_up_path, params: {
+        user: {
+          email: "fast@example.com",
+          password: "password123",
+          password_confirmation: "password123",
+          pseudonym: "fast_builder"
+        }
+      }.merge(spam_check_params(:sign_up, started_at: 1.second.ago))
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".error-summary", text: /#{Regexp.escape(I18n.t("activerecord.errors.models.user.attributes.base.submitted_too_quickly"))}/
   end
 end

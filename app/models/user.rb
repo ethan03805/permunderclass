@@ -34,6 +34,7 @@ class User < ApplicationRecord
     length: { minimum: 3, maximum: 30 },
     uniqueness: { case_sensitive: false }
   validates :reply_alerts_enabled, inclusion: { in: [ true, false ] }
+  validate :email_domain_must_not_be_disposable
 
   generates_token_for :email_verification, expires_in: 7.days do
     email_verified_at&.to_i || 0
@@ -66,5 +67,11 @@ class User < ApplicationRecord
 
   def changing_password?
     new_record? || !password.nil?
+  end
+
+  def email_domain_must_not_be_disposable
+    return if email.blank? || !DisposableEmailBlocklist.include?(email)
+
+    errors.add(:email, :disposable)
   end
 end

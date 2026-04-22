@@ -979,3 +979,10 @@ svg {
     grid-template-columns: minmax(0, 1fr) auto;
   }
 }
+.spam-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

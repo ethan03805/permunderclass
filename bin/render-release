@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-bundle exec rails db:prepare
+export RAILS_ENV="${RAILS_ENV:-production}"
+
+exec bundle exec rails db:prepare

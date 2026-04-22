@@ -4,7 +4,10 @@ services:
     runtime: docker
     dockerContext: .
     dockerfilePath: ./Dockerfile
+    autoDeployTrigger: checksPass
     healthCheckPath: /up
+    maxShutdownDelaySeconds: 120
+    preDeployCommand: bin/render-release
     envVars:
       - key: APP_HOST
         value: permanentunderclass.me
@@ -20,8 +23,14 @@ services:
         fromDatabase:
           name: permanentunderclass-db
           property: connectionString
+      - key: MAILER_FROM
+        value: noreply@mail.permanentunderclass.me
       - key: RAILS_MASTER_KEY
         sync: false
+      - key: RAILS_LOG_LEVEL
+        value: info
+      - key: RAILS_MAX_THREADS
+        value: "5"
       - key: R2_ACCOUNT_ID
         sync: false
       - key: R2_ACCESS_KEY_ID
@@ -50,7 +59,9 @@ services:
     runtime: docker
     dockerContext: .
     dockerfilePath: ./Dockerfile
+    autoDeployTrigger: checksPass
     dockerCommand: bin/worker
+    maxShutdownDelaySeconds: 120
     envVars:
       - key: APP_HOST
         value: permanentunderclass.me
@@ -66,8 +77,16 @@ services:
         fromDatabase:
           name: permanentunderclass-db
           property: connectionString
+      - key: JOB_CONCURRENCY
+        value: "1"
+      - key: MAILER_FROM
+        value: noreply@mail.permanentunderclass.me
       - key: RAILS_MASTER_KEY
         sync: false
+      - key: RAILS_LOG_LEVEL
+        value: info
+      - key: RAILS_MAX_THREADS
+        value: "5"
       - key: R2_ACCOUNT_ID
         sync: false
       - key: R2_ACCESS_KEY_ID

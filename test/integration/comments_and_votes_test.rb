@@ -1,6 +1,12 @@
 require "test_helper"
 
 class CommentsAndVotesTest < ActionDispatch::IntegrationTest
+  setup do
+    ActionMailer::Base.deliveries.clear
+    clear_enqueued_jobs
+    clear_performed_jobs
+  end
+
   test "verified users can add a top-level comment" do
     sign_in_as(users(:active_member))
     post_record = posts(:discussion_post)
@@ -98,5 +104,48 @@ class CommentsAndVotesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "ol.comment-thread > li:first-child", text: /Second root comment/
     assert_select ".comment .vote-box__summary", text: /2 upvotes/
+  end
+
+  test "reply alerts send to the parent commenter and post author when they are different users" do
+    sign_in_as(users(:another_active))
+
+    perform_enqueued_jobs only: ReplyAlertJob do
+      post post_comments_path(posts(:commented_post)), params: {
+        comment: {
+          body: "Following up on the thread.",
+          parent_id: comments(:top_comment).id
+        },
+        comment_sort: "top"
+      }
+    end
+
+    deliveries = ActionMailer::Base.deliveries
+
+    assert_equal 2, deliveries.count
+    assert_includes deliveries.map(&:to).flatten, users(:moderator).email
+    assert_includes deliveries.map(&:to).flatten, users(:active_member).email
+    assert_includes deliveries.map(&:subject), I18n.t("mailers.reply_alert_mailer.comment_reply.subject")
+    assert_includes deliveries.map(&:subject), I18n.t("mailers.reply_alert_mailer.post_comment.subject")
+  end
+
+  test "reply alerts respect the recipient preference toggle" do
+    users(:active_member).update!(reply_alerts_enabled: false)
+    sign_in_as(users(:another_active))
+
+    perform_enqueued_jobs only: ReplyAlertJob do
+      post post_comments_path(posts(:commented_post)), params: {
+        comment: {
+          body: "Only the direct reply recipient should get this.",
+          parent_id: comments(:top_comment).id
+        },
+        comment_sort: "top"
+      }
+    end
+
+    deliveries = ActionMailer::Base.deliveries
+
+    assert_equal 1, deliveries.count
+    assert_equal [ users(:moderator).email ], deliveries.first.to
+    assert_equal I18n.t("mailers.reply_alert_mailer.comment_reply.subject"), deliveries.first.subject
   end
 end

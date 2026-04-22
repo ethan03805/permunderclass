@@ -15,6 +15,8 @@
     <%= render "shared/form_errors", object: @user %>
 
     <%= form_with model: @user, url: sign_up_path, class: "form-stack" do |form| %>
+      <%= render "shared/spam_protection_fields", context: :sign_up %>
+
       <div class="field-group">
         <%= form.label :pseudonym, t("auth.fields.pseudonym") %>
         <%= form.text_field :pseudonym, autocomplete: "nickname", required: true %>

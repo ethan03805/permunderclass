@@ -19,6 +19,7 @@ Rails.application.routes.draw do
 
   get "sign-up", to: "users#new", as: :sign_up
   post "sign-up", to: "users#create"
+  patch "u/:pseudonym/preferences", to: "users#update_preferences", as: :profile_preferences
 
   get "password-reset", to: "password_resets#new", as: :password_reset
   post "password-reset", to: "password_resets#create"

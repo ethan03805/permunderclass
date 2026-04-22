@@ -1,0 +1,6 @@
+<div class="spam-trap" aria-hidden="true">
+  <%= label_tag "spam_check_website", t("spam_protection.honeypot_label") %>
+  <%= text_field_tag "spam_check[website]", "", id: "spam_check_website", tabindex: -1, autocomplete: "off" %>
+</div>
+
+<%= hidden_field_tag "spam_check[form_started_token]", spam_protection_form_token(context) %>

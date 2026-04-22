@@ -1,6 +1,7 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require "active_job/test_helper"
 require "base64"
 require "fileutils"
 require "rack/test"
@@ -15,6 +16,10 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+    setup do
+      Rails.cache.clear
+      Rack::Attack.enabled = false if defined?(Rack::Attack)
+    end
   end
 end
 
@@ -37,6 +42,15 @@ module AuthenticationTestHelper
     original.each do |key, value|
       ENV[key] = value
     end
+  end
+
+  def spam_check_params(context, started_at: 10.seconds.ago, honeypot: "")
+    {
+      spam_check: {
+        website: honeypot,
+        form_started_token: SpamCheck.form_token_for(context, now: started_at)
+      }
+    }
   end
 end
 
@@ -86,6 +100,10 @@ module MediaTestHelper
     Rack::Test::UploadedFile.new(path, "video/mp4", true)
   end
 
+  def ffprobe_available?
+    system("command -v ffprobe >/dev/null 2>&1", out: File::NULL, err: File::NULL)
+  end
+
   private
 
   def media_fixture_path(filename)
@@ -95,9 +113,11 @@ end
 
 class ActionDispatch::IntegrationTest
   include AuthenticationTestHelper
+  include ActiveJob::TestHelper
   include MediaTestHelper
 end
 
 class ActiveSupport::TestCase
+  include ActiveJob::TestHelper
   include MediaTestHelper
 end

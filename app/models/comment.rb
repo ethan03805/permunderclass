@@ -18,6 +18,7 @@ class Comment < ApplicationRecord
   before_validation :initialize_cached_fields, on: :create
   before_validation :set_depth
   before_update :touch_edited_at, if: :tracked_edit?
+  after_create_commit :enqueue_reply_alert_job
   after_create :increment_parent_reply_count, if: :parent_id?
   after_destroy :decrement_parent_reply_count, if: :parent_id?
   after_create :increment_post_comment_count
@@ -70,6 +71,10 @@ class Comment < ApplicationRecord
 
   def increment_post_comment_count
     Post.update_counters(post.id, comment_count: 1)
+  end
+
+  def enqueue_reply_alert_job
+    ReplyAlertJob.perform_later(id)
   end
 
   def decrement_post_comment_count

@@ -32,7 +32,7 @@ class SubmitFlowTest < ActionDispatch::IntegrationTest
           body: "Act now before you miss it.",
           tag_ids: [ tags(:active_tag).id ]
         }
-      }
+      }.merge(spam_check_params(:submit))
     end
 
     post_record = Post.where(title: "REVOLUTIONIZE your workflow!!").order(:id).last!
@@ -54,7 +54,7 @@ class SubmitFlowTest < ActionDispatch::IntegrationTest
           image: uploaded_png,
           tag_ids: [ tags(:active_tag).id ]
         }
-      }
+      }.merge(spam_check_params(:submit))
     end
 
     post_record = Post.where(title: "Released today").order(:id).last!
@@ -63,6 +63,8 @@ class SubmitFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "POST /submit creates a build post with a short video" do
+    skip "ffprobe is not available" unless ffprobe_available?
+
     assert_difference("Post.count", 1) do
       post submit_path, params: {
         post: {
@@ -72,11 +74,41 @@ class SubmitFlowTest < ActionDispatch::IntegrationTest
           build_status: "sharing",
           video: uploaded_mp4(filename: "submit-build.mp4", duration: 1, codec: "libx264")
         }
-      }
+      }.merge(spam_check_params(:submit))
     end
 
     post_record = Post.where(title: "Current build").order(:id).last!
     assert post_record.video.attached?
     assert_redirected_to post_path(post_record)
+  end
+
+  test "POST /submit blocks honeypot submissions" do
+    assert_no_difference("Post.count") do
+      post submit_path, params: {
+        post: {
+          post_type: "discussion",
+          title: "Spammy submit",
+          body: "This should not be accepted."
+        }
+      }.merge(spam_check_params(:submit, honeypot: "https://spam.example"))
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".error-summary", text: /#{Regexp.escape(I18n.t("activerecord.errors.models.post.attributes.base.honeypot_triggered"))}/
+  end
+
+  test "POST /submit blocks forms submitted too quickly" do
+    assert_no_difference("Post.count") do
+      post submit_path, params: {
+        post: {
+          post_type: "discussion",
+          title: "Too fast",
+          body: "This should not be accepted yet."
+        }
+      }.merge(spam_check_params(:submit, started_at: 2.seconds.ago))
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".error-summary", text: /#{Regexp.escape(I18n.t("activerecord.errors.models.post.attributes.base.submitted_too_quickly"))}/
   end
 end

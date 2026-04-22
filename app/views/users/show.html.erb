@@ -19,6 +19,25 @@
     <% end %>
   </header>
 
+  <% if current_user == @profile_user %>
+    <section id="profile-preferences" class="form-shell">
+      <p class="eyebrow"><%= t("profiles.preferences.eyebrow") %></p>
+      <h2 class="section-title"><%= t("profiles.preferences.title") %></h2>
+      <p><%= t("profiles.preferences.intro") %></p>
+
+      <%= form_with model: @profile_user, url: profile_preferences_path(@profile_user.pseudonym), method: :patch, class: "form-stack" do |form| %>
+        <label class="filter-checkbox">
+          <%= form.check_box :reply_alerts_enabled %>
+          <span><%= t("profiles.preferences.reply_alerts_enabled") %></span>
+        </label>
+
+        <div class="form-actions">
+          <%= form.submit t("profiles.preferences.submit"), class: "button" %>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
+
   <div class="profile-filters">
     <nav class="filter-group" aria-label="<%= t("profiles.filters.activity_label") %>">
       <% { "posts" => t("profiles.filters.posts"), "comments" => t("profiles.filters.comments") }.each do |activity_key, label| %>
