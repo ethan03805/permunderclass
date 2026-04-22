@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  FRESH_ACCOUNT_WINDOW = 24.hours
   PSEUDONYM_FORMAT = /\A[a-z0-9_]+\z/i
 
   has_many :posts, dependent: :restrict_with_error
@@ -50,6 +51,10 @@ class User < ApplicationRecord
 
   def password_reset_permitted?
     active? || pending_email_verification?
+  end
+
+  def fresh_account?(reference_time: Time.current)
+    active? && email_verified? && email_verified_at >= (reference_time - FRESH_ACCOUNT_WINDOW)
   end
 
   def verify_email!

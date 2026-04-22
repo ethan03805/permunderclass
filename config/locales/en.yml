@@ -677,6 +677,7 @@ en:
               honeypot_triggered: "That submission could not be accepted."
               submission_token_invalid: "Please try submitting the form again."
               submitted_too_quickly: "That form was submitted too quickly. Please try again."
+              turnstile_failed: "Turnstile verification could not be completed."
             title:
               blank: "must be present"
               too_long: "must be %{count} characters or fewer"

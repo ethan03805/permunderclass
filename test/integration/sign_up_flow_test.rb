@@ -37,6 +37,29 @@ class SignUpFlowTest < ActionDispatch::IntegrationTest
     assert_select ".site-nav__status a[href='#{profile_path(user.pseudonym)}']", text: user.pseudonym
   end
 
+  test "POST /sign-up creates an account when turnstile verification succeeds with production-shaped config" do
+    with_env("TURNSTILE_SECRET_KEY" => "secret", "TURNSTILE_SITE_KEY" => "site-key") do
+      assert_difference("User.count", 1) do
+        with_stubbed_turnstile_verification(true) do
+          post sign_up_path, params: {
+            user: {
+              email: "turnstile@example.com",
+              password: "password123",
+              password_confirmation: "password123",
+              pseudonym: "turnstile_builder"
+            },
+            "cf-turnstile-response" => "token"
+          }.merge(spam_check_params(:sign_up))
+        end
+      end
+    end
+
+    user = User.order(:id).last
+
+    assert_redirected_to root_path
+    assert user.pending_email_verification?
+  end
+
   test "POST /sign-up re-renders when the form is invalid" do
     assert_no_difference("User.count") do
       post sign_up_path, params: {

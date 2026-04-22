@@ -52,6 +52,20 @@ module AuthenticationTestHelper
       }
     }
   end
+
+  def with_stubbed_turnstile_verification(result)
+    singleton_class = TurnstileVerification.singleton_class
+
+    singleton_class.alias_method :__original_new_for_test, :new
+    singleton_class.define_method(:new) do |*_args, **_kwargs|
+      Struct.new(:verified?).new(result)
+    end
+
+    yield
+  ensure
+    singleton_class.alias_method :new, :__original_new_for_test
+    singleton_class.remove_method :__original_new_for_test
+  end
 end
 
 module MediaTestHelper

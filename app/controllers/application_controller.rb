@@ -33,6 +33,13 @@ class ApplicationController < ActionController::Base
     ).call
   end
 
+  def turnstile_verified?(token: params["cf-turnstile-response"])
+    TurnstileVerification.new(
+      token: token,
+      remote_ip: request.remote_ip
+    ).verified?
+  end
+
   def redirect_to_safe_return_path(fallback_location, anchor: nil, **options)
     location = safe_return_path(params[:return_to]) || fallback_location
     location = "#{location}##{anchor}" if anchor.present?
