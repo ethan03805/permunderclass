@@ -10,9 +10,14 @@
           <%= link_to t("nav.submit"), submit_path, class: nav_link_class(submit_path) %>
         </li>
       <% end %>
+      <% if moderation_user? %>
+        <li>
+          <%= link_to t("nav.moderation"), mod_reports_path, class: nav_link_class(mod_reports_path) %>
+        </li>
+      <% end %>
       <li class="site-nav__status">
         <span class="eyebrow"><%= t("nav.account_label") %></span>
-        <span><%= current_user.pseudonym %></span>
+        <%= link_to current_user.pseudonym, profile_path(current_user.pseudonym), class: nav_link_class(profile_path(current_user.pseudonym)) %>
       </li>
       <li class="site-nav__status">
         <span class="eyebrow"><%= t("nav.account_state_label") %></span>

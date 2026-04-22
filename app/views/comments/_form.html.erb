@@ -1,0 +1,19 @@
+<%= render "shared/form_errors", object: comment %>
+
+<%= form_with model: [ post, comment ], class: "form-stack" do |form| %>
+  <%= hidden_field_tag :comment_sort, comment_sort %>
+
+  <% if parent.present? %>
+    <%= form.hidden_field :parent_id, value: parent.id %>
+  <% end %>
+
+  <div class="field-group">
+    <%= form.label :body, t("activerecord.attributes.comment.body") %>
+    <%= form.text_area :body, rows: parent.present? ? 4 : 6, maxlength: 5000 %>
+    <p class="field-hint"><%= t("comments.composer.body_hint") %></p>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit t(parent.present? ? "comments.composer.submit_reply" : "comments.composer.submit"), class: "button" %>
+  </div>
+<% end %>

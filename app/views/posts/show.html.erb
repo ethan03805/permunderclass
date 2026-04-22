@@ -26,7 +26,7 @@
   </header>
 
   <p class="post-detail__meta">
-    <span><%= @post.user.pseudonym %></span>
+    <span><%= link_to @post.user.pseudonym, profile_path(@post.user.pseudonym) %></span>
     <span class="post-card__divider" aria-hidden="true">·</span>
     <time datetime="<%= @post.published_at.iso8601 %>"><%= l(@post.published_at, format: :short) %></time>
     <% if @post.edited_at.present? %>
@@ -38,6 +38,20 @@
       <span><%= t("build_statuses.#{@post.build_status}") %></span>
     <% end %>
   </p>
+
+  <%= render "shared/vote_controls",
+    target: @post,
+    target_path: post_vote_path(@post),
+    current_value: @post_vote_value,
+    anchor: "comments",
+    interactive: current_user&.active? && current_user.email_verified? && !@post.removed? %>
+
+  <% if reportable_by_current_user?(@post) %>
+    <%= render "reports/form",
+      target: @post,
+      anchor: "post-#{@post.id}",
+      return_to: post_path(@post) %>
+  <% end %>
 
   <% if @post.tags.any? %>
     <ul class="post-card__tags" role="list">
@@ -66,4 +80,102 @@
   <div class="post-detail__body">
     <%= simple_format(@post.body) %>
   </div>
+
+  <% if moderation_user? %>
+    <section class="moderation-panel">
+      <p class="eyebrow"><%= t("moderation.post_panel.eyebrow") %></p>
+      <h2 class="section-title"><%= t("moderation.post_panel.title") %></h2>
+      <p class="field-hint"><%= t("moderation.post_panel.report_count", count: @post.report_count) %></p>
+
+      <% if @post.published? %>
+        <%= form_with url: moderate_mod_post_path(@post), method: :patch, class: "moderation-form" do |form| %>
+          <%= hidden_field_tag "moderation[action_type]", "rewrite_requested" %>
+          <div class="field-group">
+            <%= form.label :public_note, t("moderation.fields.public_note") %>
+            <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+          </div>
+          <div class="field-group">
+            <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+            <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+          </div>
+          <%= form.submit t("moderation.post_panel.request_rewrite"), class: "button" %>
+        <% end %>
+      <% end %>
+
+      <% if !@post.removed? %>
+        <%= form_with url: moderate_mod_post_path(@post), method: :patch, class: "moderation-form" do |form| %>
+          <%= hidden_field_tag "moderation[action_type]", "removed" %>
+          <div class="field-group">
+            <%= form.label :public_note, t("moderation.fields.public_note") %>
+            <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+          </div>
+          <div class="field-group">
+            <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+            <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+          </div>
+          <%= form.submit t("moderation.post_panel.remove"), class: "button" %>
+        <% end %>
+      <% end %>
+
+      <% if @post.rewrite_requested? || @post.removed? %>
+        <%= form_with url: moderate_mod_post_path(@post), method: :patch, class: "moderation-form" do |form| %>
+          <%= hidden_field_tag "moderation[action_type]", "restored" %>
+          <div class="field-group">
+            <%= form.label :public_note, t("moderation.fields.public_note") %>
+            <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+          </div>
+          <div class="field-group">
+            <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+            <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+          </div>
+          <%= form.submit t("moderation.post_panel.restore"), class: "button" %>
+        <% end %>
+      <% end %>
+    </section>
+  <% end %>
 </article>
+
+<section class="comments-section" id="comments">
+  <header class="comments-section__header">
+    <div>
+      <p class="eyebrow"><%= t("comments.eyebrow") %></p>
+      <h2 class="section-title"><%= t("comments.title", count: @post.comment_count) %></h2>
+    </div>
+
+    <nav class="comment-sorts" aria-label="<%= t("comments.sorts.label") %>">
+      <% comment_sort_labels.each do |sort_key, label| %>
+        <%= link_to label,
+          post_path(@post, comment_sort: sort_key, anchor: "comments"),
+          class: [ "comment-sorts__link", ("is-active" if @comment_sort == sort_key) ].compact.join(" ") %>
+      <% end %>
+    </nav>
+  </header>
+
+  <% if current_user&.active? && current_user.email_verified? && !@post.removed? %>
+    <section class="comment-composer">
+      <p class="eyebrow"><%= t("comments.composer.eyebrow") %></p>
+      <h3 class="section-title"><%= t("comments.composer.title") %></h3>
+      <%= render "comments/form", post: @post, comment: @new_comment, parent: nil, comment_sort: @comment_sort %>
+    </section>
+  <% elsif !authenticated_user? %>
+    <p class="comment-prompt"><%= t("comments.composer.sign_in_html", sign_in_path: sign_in_path) %></p>
+  <% elsif current_user.pending_email_verification? %>
+    <p class="comment-prompt"><%= t("comments.composer.verify_email") %></p>
+  <% end %>
+
+  <% if Array(@comment_thread[nil]).any? %>
+    <ol class="comment-thread" role="list">
+      <% Array(@comment_thread[nil]).each do |comment| %>
+        <%= render "comments/comment",
+          comment: comment,
+          comment_thread: @comment_thread,
+          comment_vote_values: @comment_vote_values,
+          reply_comment: @reply_comment,
+          comment_sort: @comment_sort,
+          post: @post %>
+      <% end %>
+    </ol>
+  <% else %>
+    <p class="feed-empty"><%= t("comments.empty") %></p>
+  <% end %>
+</section>

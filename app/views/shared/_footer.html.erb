@@ -17,5 +17,17 @@
       <h2 id="footer-constraints-title" class="site-footer__title"><%= t("footer.constraints.title") %></h2>
       <p class="site-footer__body"><%= t("footer.constraints.body") %></p>
     </section>
+
+    <nav class="site-footer__section" aria-labelledby="footer-pages-title">
+      <p class="eyebrow"><%= t("footer.pages.eyebrow") %></p>
+      <h2 id="footer-pages-title" class="site-footer__title"><%= t("footer.pages.title") %></h2>
+      <ul class="site-footer__links" role="list">
+        <li><%= link_to t("footer.pages.links.about"), about_path %></li>
+        <li><%= link_to t("footer.pages.links.rules"), rules_path %></li>
+        <li><%= link_to t("footer.pages.links.faq"), faq_path %></li>
+        <li><%= link_to t("footer.pages.links.privacy"), privacy_path %></li>
+        <li><%= link_to t("footer.pages.links.terms"), terms_path %></li>
+      </ul>
+    </nav>
   </div>
 </footer>

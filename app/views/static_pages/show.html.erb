@@ -1,0 +1,32 @@
+<% content_for :title, page_title(@page["title"]) %>
+<% content_for :meta_description, @page["description"] %>
+
+<section class="content-page">
+  <header class="page-stack">
+    <div class="auth-shell">
+      <p class="eyebrow"><%= @page["eyebrow"] %></p>
+      <h1 class="section-title"><%= @page["title"] %></h1>
+      <p class="section-intro"><%= @page["intro"] %></p>
+    </div>
+  </header>
+
+  <div class="content-page__sections">
+    <% Array(@page["sections"]).each do |section| %>
+      <section class="content-page__section">
+        <h2 class="section-title"><%= section["title"] %></h2>
+
+        <% if section["body"].present? %>
+          <p class="section-intro"><%= section["body"] %></p>
+        <% end %>
+
+        <% if Array(section["items"]).any? %>
+          <ul class="content-page__list">
+            <% Array(section["items"]).each do |item| %>
+              <li><%= item %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+</section>

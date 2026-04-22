@@ -1,0 +1,34 @@
+<article class="activity-item">
+  <p class="activity-item__meta">
+    <span class="eyebrow"><%= t("post_types.#{post.post_type}") %></span>
+    <% if post.rewrite_requested? %>
+      <span class="post-card__divider" aria-hidden="true">·</span>
+      <span><%= t("profiles.post_statuses.rewrite_requested") %></span>
+    <% elsif post.removed? %>
+      <span class="post-card__divider" aria-hidden="true">·</span>
+      <span><%= t("profiles.post_statuses.removed") %></span>
+    <% end %>
+    <% if post.post_type_build? && post.build_status.present? %>
+      <span class="post-card__divider" aria-hidden="true">·</span>
+      <span><%= t("build_statuses.#{post.build_status}") %></span>
+    <% end %>
+    <span class="post-card__divider" aria-hidden="true">·</span>
+    <time datetime="<%= post.published_at.iso8601 %>"><%= l(post.published_at, format: :short) %></time>
+  </p>
+
+  <h2 class="activity-item__title">
+    <%= link_to post.title, post_path(post) %>
+  </h2>
+
+  <div class="activity-item__body">
+    <%= simple_format(truncate(post.body, length: 320)) %>
+  </div>
+
+  <% if post.tags.any? %>
+    <ul class="post-card__tags" role="list">
+      <% post.tags.each do |tag| %>
+        <li><%= link_to tag.name, tag_path(tag.slug) %></li>
+      <% end %>
+    </ul>
+  <% end %>
+</article>

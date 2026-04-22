@@ -1,0 +1,119 @@
+<% content_for :title, page_title(t("moderation.tags.title")) %>
+
+<section class="page-stack moderation-layout">
+  <header class="auth-shell">
+    <p class="eyebrow"><%= t("moderation.tags.eyebrow") %></p>
+    <h1 class="section-title"><%= t("moderation.tags.title") %></h1>
+    <p class="section-intro"><%= t("moderation.tags.intro") %></p>
+  </header>
+
+  <section class="moderation-panel">
+    <p class="eyebrow"><%= t("moderation.tags.create_eyebrow") %></p>
+    <h2 class="section-title"><%= t("moderation.tags.create_title") %></h2>
+
+    <%= form_with url: mod_tags_path, class: "moderation-form" do |form| %>
+      <div class="field-group">
+        <%= form.label :name, t("activerecord.attributes.tag.name") %>
+        <%= form.text_field :name, name: "tag[name]", required: true %>
+      </div>
+      <div class="field-group">
+        <%= form.label :public_note, t("moderation.fields.public_note") %>
+        <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+      </div>
+      <div class="field-group">
+        <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+        <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+      </div>
+      <%= form.submit t("moderation.tags.create_submit"), class: "button" %>
+    <% end %>
+  </section>
+
+  <section class="moderation-panel">
+    <p class="eyebrow"><%= t("moderation.tags.merge_eyebrow") %></p>
+    <h2 class="section-title"><%= t("moderation.tags.merge_title") %></h2>
+
+    <%= form_with url: merge_mod_tags_path, method: :patch, class: "moderation-form" do |form| %>
+      <div class="field-group">
+        <%= form.label :source_tag_id, t("moderation.tags.source_label") %>
+        <%= form.select :source_tag_id,
+          options_from_collection_for_select(@tags, :id, :name),
+          {},
+          name: :source_tag_id,
+          class: "filter-select" %>
+      </div>
+      <div class="field-group">
+        <%= form.label :target_tag_id, t("moderation.tags.target_label") %>
+        <%= form.select :target_tag_id,
+          options_from_collection_for_select(@tags, :id, :name),
+          {},
+          name: :target_tag_id,
+          class: "filter-select" %>
+      </div>
+      <div class="field-group">
+        <%= form.label :public_note, t("moderation.fields.public_note") %>
+        <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+      </div>
+      <div class="field-group">
+        <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+        <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+      </div>
+      <%= form.submit t("moderation.tags.merge_submit"), class: "button" %>
+    <% end %>
+  </section>
+
+  <section class="moderation-panel">
+    <p class="eyebrow"><%= t("moderation.tags.list_eyebrow") %></p>
+    <h2 class="section-title"><%= t("moderation.tags.list_title") %></h2>
+
+    <ol class="tag-admin-list" role="list">
+      <% @tags.each do |tag| %>
+        <li id="tag-<%= tag.id %>" class="tag-admin-list__item">
+          <p class="activity-item__meta">
+            <span><%= tag.name %></span>
+            <span class="post-card__divider" aria-hidden="true">·</span>
+            <span><%= t("moderation.tags.states.#{tag.state}") %></span>
+            <span class="post-card__divider" aria-hidden="true">·</span>
+            <span><%= t("moderation.tags.attached_posts", count: tag.posts.count) %></span>
+          </p>
+
+          <%= form_with url: mod_tag_path(tag), method: :patch, class: "moderation-form moderation-form--inline" do |form| %>
+            <%= hidden_field_tag :tag_action, "rename" %>
+            <div class="field-group">
+              <%= form.label :name, t("activerecord.attributes.tag.name") %>
+              <%= form.text_field :name, name: "tag[name]", value: tag.name, required: true %>
+            </div>
+            <div class="field-group">
+              <%= form.label :public_note, t("moderation.fields.public_note") %>
+              <%= form.text_area :public_note, name: "moderation[public_note]", rows: 2, required: true %>
+            </div>
+            <div class="field-group">
+              <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+              <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 2, required: true %>
+            </div>
+            <%= form.submit t("moderation.tags.rename_submit"), class: "button" %>
+          <% end %>
+
+          <% unless tag.archived? %>
+            <%= form_with url: mod_tag_path(tag), method: :patch, class: "moderation-form moderation-form--inline" do |form| %>
+              <%= hidden_field_tag :tag_action, "archive" %>
+              <div class="field-group">
+                <%= form.label :public_note, t("moderation.fields.public_note") %>
+                <%= form.text_area :public_note, name: "moderation[public_note]", rows: 2, required: true %>
+              </div>
+              <div class="field-group">
+                <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+                <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 2, required: true %>
+              </div>
+              <%= form.submit t("moderation.tags.archive_submit"), class: "button" %>
+            <% end %>
+          <% end %>
+        </li>
+      <% end %>
+    </ol>
+  </section>
+
+  <%= render "mod/shared/action_log",
+    actions: @recent_actions,
+    eyebrow: t("moderation.audit.eyebrow"),
+    title: t("moderation.audit.title") %>
+</section>

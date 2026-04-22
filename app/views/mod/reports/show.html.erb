@@ -1,0 +1,141 @@
+<% content_for :title, page_title(t("reports.labels.report_number", id: @report.id)) %>
+
+<section class="page-stack moderation-layout">
+  <header class="auth-shell">
+    <p class="eyebrow"><%= t("moderation.queue.eyebrow") %></p>
+    <h1 class="section-title"><%= t("reports.labels.report_number", id: @report.id) %></h1>
+    <p class="section-intro"><%= t("moderation.report_review.intro") %></p>
+  </header>
+
+  <section class="moderation-panel">
+    <p class="eyebrow"><%= t("moderation.report_review.details_eyebrow") %></p>
+    <h2 class="section-title"><%= t("moderation.report_review.details_title") %></h2>
+    <p class="activity-item__meta">
+      <span><%= t("reports.labels.status") %>: <%= t("reports.statuses.#{@report.status}") %></span>
+      <span class="post-card__divider" aria-hidden="true">·</span>
+      <span><%= t("reports.labels.reason") %>: <%= report_reason_labels[@report.reason_code] %></span>
+      <span class="post-card__divider" aria-hidden="true">·</span>
+      <span><%= t("reports.labels.reporter") %>: <%= @report.reporter.pseudonym %></span>
+    </p>
+    <% if @report.details.present? %>
+      <p><%= @report.details %></p>
+    <% end %>
+    <p class="audit-log__target">
+      <%= link_to moderation_target_label(@report.target), moderation_target_path(@report.target) %>
+    </p>
+  </section>
+
+  <% if @report.open? %>
+    <section class="moderation-panel">
+      <p class="eyebrow"><%= t("moderation.report_review.actions_eyebrow") %></p>
+      <h2 class="section-title"><%= t("moderation.report_review.actions_title") %></h2>
+
+      <% if @report.target.is_a?(Post) %>
+        <%= form_with url: mod_report_path(@report), method: :patch, class: "moderation-form" do |form| %>
+          <%= hidden_field_tag "moderation[decision]", "rewrite_requested" %>
+          <div class="field-group">
+            <%= form.label :public_note, t("moderation.fields.public_note") %>
+            <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+          </div>
+          <div class="field-group">
+            <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+            <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+          </div>
+          <%= form.submit t("moderation.report_review.request_rewrite"), class: "button" %>
+        <% end %>
+
+        <%= form_with url: mod_report_path(@report), method: :patch, class: "moderation-form" do |form| %>
+          <%= hidden_field_tag "moderation[decision]", "removed" %>
+          <div class="field-group">
+            <%= form.label :public_note, t("moderation.fields.public_note") %>
+            <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+          </div>
+          <div class="field-group">
+            <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+            <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+          </div>
+          <%= form.submit t("moderation.report_review.remove_post"), class: "button" %>
+        <% end %>
+      <% elsif @report.target.is_a?(Comment) %>
+        <%= form_with url: mod_report_path(@report), method: :patch, class: "moderation-form" do |form| %>
+          <%= hidden_field_tag "moderation[decision]", "comment_removed" %>
+          <div class="field-group">
+            <%= form.label :public_note, t("moderation.fields.public_note") %>
+            <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+          </div>
+          <div class="field-group">
+            <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+            <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+          </div>
+          <%= form.submit t("moderation.report_review.remove_comment"), class: "button" %>
+        <% end %>
+      <% elsif @report.target.is_a?(User) %>
+        <%= form_with url: mod_report_path(@report), method: :patch, class: "moderation-form" do |form| %>
+          <%= hidden_field_tag "moderation[decision]", "user_suspended" %>
+          <div class="field-group">
+            <%= form.label :public_note, t("moderation.fields.public_note") %>
+            <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+          </div>
+          <div class="field-group">
+            <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+            <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+          </div>
+          <%= form.submit t("moderation.report_review.suspend_user"), class: "button" %>
+        <% end %>
+
+        <%= form_with url: mod_report_path(@report), method: :patch, class: "moderation-form" do |form| %>
+          <%= hidden_field_tag "moderation[decision]", "user_banned" %>
+          <div class="field-group">
+            <%= form.label :public_note, t("moderation.fields.public_note") %>
+            <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+          </div>
+          <div class="field-group">
+            <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+            <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+          </div>
+          <%= form.submit t("moderation.report_review.ban_user"), class: "button" %>
+        <% end %>
+      <% end %>
+
+      <%= form_with url: mod_report_path(@report), method: :patch, class: "moderation-form" do |form| %>
+        <%= hidden_field_tag "moderation[decision]", "dismiss_report" %>
+        <div class="field-group">
+          <%= form.label :public_note, t("moderation.fields.public_note") %>
+          <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+        </div>
+        <div class="field-group">
+          <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+          <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+        </div>
+        <%= form.submit t("moderation.report_review.dismiss_report"), class: "button" %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <section class="moderation-panel">
+    <p class="eyebrow"><%= t("moderation.report_review.related_eyebrow") %></p>
+    <h2 class="section-title"><%= t("moderation.report_review.related_title") %></h2>
+
+    <ol class="report-list" role="list">
+      <% @related_reports.each do |report| %>
+        <li class="report-list__item">
+          <p class="activity-item__meta">
+            <span><%= t("reports.labels.report_number", id: report.id) %></span>
+            <span class="post-card__divider" aria-hidden="true">·</span>
+            <span><%= t("reports.statuses.#{report.status}") %></span>
+            <span class="post-card__divider" aria-hidden="true">·</span>
+            <span><%= report.reporter.pseudonym %></span>
+          </p>
+          <% if report.details.present? %>
+            <p><%= report.details %></p>
+          <% end %>
+        </li>
+      <% end %>
+    </ol>
+  </section>
+
+  <%= render "mod/shared/action_log",
+    actions: @recent_target_actions,
+    eyebrow: t("moderation.audit.eyebrow"),
+    title: t("moderation.report_review.target_actions_title") %>
+</section>

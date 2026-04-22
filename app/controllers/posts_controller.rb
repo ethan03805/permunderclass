@@ -32,6 +32,14 @@ class PostsController < ApplicationController
   end
 
   def show
+    thread = CommentThreadQuery.new(post: @post, sort: params[:comment_sort]).call
+
+    @comment_thread = thread[:comments_by_parent]
+    @comment_sort = thread[:sort]
+    @post_vote_value = current_user&.post_votes&.find_by(post: @post)&.value
+    @comment_vote_values = current_user.present? ? current_user.comment_votes.where(comment_id: thread[:comment_ids]).pluck(:comment_id, :value).to_h : {}
+    @new_comment = Comment.new(post: @post)
+    @reply_comment = nil
   end
 
   def edit

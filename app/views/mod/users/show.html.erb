@@ -1,0 +1,101 @@
+<% content_for :title, page_title(t("moderation.user_review.title", pseudonym: @user.pseudonym)) %>
+
+<section class="page-stack moderation-layout">
+  <header class="auth-shell">
+    <p class="eyebrow"><%= t("moderation.user_review.eyebrow") %></p>
+    <h1 class="section-title"><%= t("moderation.user_review.title", pseudonym: @user.pseudonym) %></h1>
+    <p class="section-intro"><%= t("moderation.user_review.intro") %></p>
+    <p class="activity-item__meta">
+      <span><%= t("moderation.user_review.state_label") %>: <%= t("nav.account_states.#{@user.state}") %></span>
+      <span class="post-card__divider" aria-hidden="true">·</span>
+      <span><%= @user.email %></span>
+    </p>
+  </header>
+
+  <section class="moderation-panel">
+    <p class="eyebrow"><%= t("moderation.user_review.actions_eyebrow") %></p>
+    <h2 class="section-title"><%= t("moderation.user_review.actions_title") %></h2>
+
+    <%= form_with url: moderate_mod_user_path(@user), method: :patch, class: "moderation-form" do |form| %>
+      <%= hidden_field_tag "moderation[action_type]", "user_suspended" %>
+      <div class="field-group">
+        <%= form.label :public_note, t("moderation.fields.public_note") %>
+        <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+      </div>
+      <div class="field-group">
+        <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+        <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+      </div>
+      <%= form.submit t("moderation.user_review.suspend"), class: "button" %>
+    <% end %>
+
+    <%= form_with url: moderate_mod_user_path(@user), method: :patch, class: "moderation-form" do |form| %>
+      <%= hidden_field_tag "moderation[action_type]", "user_banned" %>
+      <div class="field-group">
+        <%= form.label :public_note, t("moderation.fields.public_note") %>
+        <%= form.text_area :public_note, name: "moderation[public_note]", rows: 3, required: true %>
+      </div>
+      <div class="field-group">
+        <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+        <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 3, required: true %>
+      </div>
+      <%= form.submit t("moderation.user_review.ban"), class: "button" %>
+    <% end %>
+  </section>
+
+  <section class="moderation-panel">
+    <p class="eyebrow"><%= t("moderation.user_review.reports_eyebrow") %></p>
+    <h2 class="section-title"><%= t("moderation.user_review.reports_title") %></h2>
+    <% if @reports.any? %>
+      <ol class="report-list" role="list">
+        <% @reports.each do |report| %>
+          <li class="report-list__item">
+            <p class="activity-item__meta">
+              <span><%= t("reports.labels.report_number", id: report.id) %></span>
+              <span class="post-card__divider" aria-hidden="true">·</span>
+              <span><%= t("reports.statuses.#{report.status}") %></span>
+              <span class="post-card__divider" aria-hidden="true">·</span>
+              <span><%= report.reporter.pseudonym %></span>
+            </p>
+            <p><%= link_to t("moderation.queue.review_link"), mod_report_path(report) %></p>
+          </li>
+        <% end %>
+      </ol>
+    <% else %>
+      <p class="feed-empty"><%= t("moderation.user_review.no_reports") %></p>
+    <% end %>
+  </section>
+
+  <section class="moderation-panel">
+    <p class="eyebrow"><%= t("moderation.user_review.posts_eyebrow") %></p>
+    <h2 class="section-title"><%= t("moderation.user_review.posts_title") %></h2>
+    <% if @posts.any? %>
+      <ol class="activity-list" role="list">
+        <% @posts.each do |post| %>
+          <li><%= render "users/post", post: post %></li>
+        <% end %>
+      </ol>
+    <% else %>
+      <p class="feed-empty"><%= t("profiles.empty.posts") %></p>
+    <% end %>
+  </section>
+
+  <section class="moderation-panel">
+    <p class="eyebrow"><%= t("moderation.user_review.comments_eyebrow") %></p>
+    <h2 class="section-title"><%= t("moderation.user_review.comments_title") %></h2>
+    <% if @comments.any? %>
+      <ol class="activity-list" role="list">
+        <% @comments.each do |comment| %>
+          <li><%= render "users/comment", comment: comment %></li>
+        <% end %>
+      </ol>
+    <% else %>
+      <p class="feed-empty"><%= t("profiles.empty.comments") %></p>
+    <% end %>
+  </section>
+
+  <%= render "mod/shared/action_log",
+    actions: @recent_actions,
+    eyebrow: t("moderation.audit.eyebrow"),
+    title: t("moderation.user_review.action_log_title") %>
+</section>

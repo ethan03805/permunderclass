@@ -1,0 +1,96 @@
+<% children = Array(comment_thread[comment.id]) %>
+<% reply_form_comment = reply_comment&.parent_id == comment.id ? reply_comment : Comment.new(post: post, parent: comment) %>
+<% reply_form_active = reply_comment&.parent_id == comment.id %>
+
+<li id="comment-<%= comment.id %>" class="comment-thread__item">
+  <article class="comment <%= "comment--removed" if comment.removed? %>">
+    <header class="comment__header">
+      <div>
+        <p class="comment__meta">
+          <% if comment.removed? %>
+            <span><%= t("comments.tombstone.title") %></span>
+          <% else %>
+            <span><%= link_to comment.user.pseudonym, profile_path(comment.user.pseudonym) %></span>
+          <% end %>
+          <span class="post-card__divider" aria-hidden="true">·</span>
+          <time datetime="<%= comment.created_at.iso8601 %>"><%= l(comment.created_at, format: :short) %></time>
+          <% if comment.edited_at.present? %>
+            <span class="post-card__divider" aria-hidden="true">·</span>
+            <span><%= t("comments.meta.edited_at", date: l(comment.edited_at, format: :short)) %></span>
+          <% end %>
+        </p>
+
+        <% if comment.reply_count.positive? %>
+          <p class="comment__meta">
+            <%= t("comments.replies", count: comment.reply_count) %>
+          </p>
+        <% end %>
+      </div>
+
+      <%= render "shared/vote_controls",
+        target: comment,
+        target_path: comment_vote_path(comment),
+        current_value: comment_vote_values[comment.id],
+        anchor: "comment-#{comment.id}",
+        interactive: current_user&.active? && current_user.email_verified? && !comment.removed? && !post.removed?,
+        compact: true %>
+    </header>
+
+    <% if comment.removed? %>
+      <p class="comment__tombstone"><%= t("comments.tombstone.body") %></p>
+    <% else %>
+      <div class="comment__body">
+        <%= simple_format(comment.body) %>
+      </div>
+
+      <% if reportable_by_current_user?(comment) %>
+        <%= render "reports/form",
+          target: comment,
+          anchor: "comment-#{comment.id}",
+          return_to: post_path(post, comment_sort: comment_sort) %>
+      <% end %>
+
+      <% if current_user&.active? && current_user.email_verified? && !post.removed? %>
+        <details class="comment__reply" <%= "open" if reply_form_active %>>
+          <summary><%= t("comments.actions.reply") %></summary>
+          <%= render "comments/form",
+            post: post,
+            comment: reply_form_comment,
+            parent: comment,
+            comment_sort: comment_sort %>
+        </details>
+      <% end %>
+
+      <% if moderation_user? %>
+        <section class="moderation-panel moderation-panel--compact">
+          <p class="eyebrow"><%= t("moderation.comment_panel.eyebrow") %></p>
+          <%= form_with url: moderate_mod_comment_path(comment), method: :patch, class: "moderation-form" do |form| %>
+            <div class="field-group">
+              <%= form.label :public_note, t("moderation.fields.public_note") %>
+              <%= form.text_area :public_note, name: "moderation[public_note]", rows: 2, required: true %>
+            </div>
+            <div class="field-group">
+              <%= form.label :internal_note, t("moderation.fields.internal_note") %>
+              <%= form.text_area :internal_note, name: "moderation[internal_note]", rows: 2, required: true %>
+            </div>
+            <%= form.submit t("moderation.comment_panel.remove"), class: "button" %>
+          <% end %>
+        </section>
+      <% end %>
+    <% end %>
+
+    <% if children.any? %>
+      <ol class="comment-thread comment-thread--nested" role="list">
+        <% children.each do |child_comment| %>
+          <%= render "comments/comment",
+            comment: child_comment,
+            comment_thread: comment_thread,
+            comment_vote_values: comment_vote_values,
+            reply_comment: reply_comment,
+            comment_sort: comment_sort,
+            post: post %>
+        <% end %>
+      </ol>
+    <% end %>
+  </article>
+</li>

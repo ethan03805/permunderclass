@@ -1,0 +1,16 @@
+<article class="activity-item">
+  <p class="activity-item__meta">
+    <span><%= t("profiles.comments.on_post") %></span>
+    <%= link_to comment.post.title, post_path(comment.post, anchor: "comment-#{comment.id}") %>
+    <span class="post-card__divider" aria-hidden="true">·</span>
+    <time datetime="<%= comment.created_at.iso8601 %>"><%= l(comment.created_at, format: :short) %></time>
+  </p>
+
+  <% if comment.removed? %>
+    <p class="activity-item__body activity-item__body--muted"><%= t("comments.tombstone.body") %></p>
+  <% else %>
+    <div class="activity-item__body">
+      <%= simple_format(comment.body) %>
+    </div>
+  <% end %>
+</article>

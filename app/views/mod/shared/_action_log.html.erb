@@ -1,0 +1,29 @@
+<section class="moderation-panel">
+  <p class="eyebrow"><%= eyebrow %></p>
+  <h2 class="section-title"><%= title %></h2>
+
+  <% if actions.any? %>
+    <ol class="audit-log" role="list">
+      <% actions.each do |action| %>
+        <li class="audit-log__item">
+          <p class="activity-item__meta">
+            <span><%= moderator_action_labels[action.action_type] %></span>
+            <span class="post-card__divider" aria-hidden="true">·</span>
+            <span><%= action.moderator.pseudonym %></span>
+            <span class="post-card__divider" aria-hidden="true">·</span>
+            <time datetime="<%= action.created_at.iso8601 %>"><%= l(action.created_at, format: :short) %></time>
+          </p>
+          <% if moderation_target_path(action.target).present? %>
+            <p class="audit-log__target">
+              <%= link_to moderation_target_label(action.target), moderation_target_path(action.target) %>
+            </p>
+          <% end %>
+          <p class="audit-log__note"><%= action.public_note %></p>
+          <p class="field-hint"><%= action.internal_note %></p>
+        </li>
+      <% end %>
+    </ol>
+  <% else %>
+    <p class="feed-empty"><%= t("moderation.audit.empty") %></p>
+  <% end %>
+</section>

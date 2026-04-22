@@ -1,0 +1,63 @@
+<% content_for :title, page_title(t("profiles.title", pseudonym: @profile_user.pseudonym)) %>
+<% content_for :meta_description, t("profiles.description", pseudonym: @profile_user.pseudonym) %>
+
+<section class="profile-layout">
+  <header class="profile-header">
+    <p class="eyebrow"><%= t("profiles.eyebrow") %></p>
+    <h1 class="section-title"><%= t("profiles.title", pseudonym: @profile_user.pseudonym) %></h1>
+    <p class="section-intro"><%= t("profiles.intro") %></p>
+
+    <% if reportable_by_current_user?(@profile_user) %>
+      <%= render "reports/form",
+        target: @profile_user,
+        anchor: "profile-header",
+        return_to: profile_path(@profile_user.pseudonym) %>
+    <% end %>
+
+    <% if moderation_user? %>
+      <p><%= link_to t("moderation.user_panel.review_link"), mod_user_path(@profile_user), class: "button" %></p>
+    <% end %>
+  </header>
+
+  <div class="profile-filters">
+    <nav class="filter-group" aria-label="<%= t("profiles.filters.activity_label") %>">
+      <% { "posts" => t("profiles.filters.posts"), "comments" => t("profiles.filters.comments") }.each do |activity_key, label| %>
+        <%= link_to label,
+          profile_path(@profile_user.pseudonym, feed_params_for(view: activity_key, page: nil)),
+          class: [ "filter-link", ("is-active" if @activity == activity_key) ].compact.join(" ") %>
+      <% end %>
+    </nav>
+
+    <% if @activity == "posts" %>
+      <nav class="filter-group" aria-label="<%= t("profiles.filters.post_type_label") %>">
+        <%= link_to t("profiles.filters.all_types"),
+          profile_path(@profile_user.pseudonym, feed_params_for(post_type: nil, page: nil)),
+          class: [ "filter-link", ("is-active" if @post_type.blank?) ].compact.join(" ") %>
+
+        <% post_type_labels.each do |post_type, label| %>
+          <%= link_to label,
+            profile_path(@profile_user.pseudonym, feed_params_for(post_type: post_type, page: nil)),
+            class: [ "filter-link", ("is-active" if @post_type == post_type) ].compact.join(" ") %>
+        <% end %>
+      </nav>
+    <% end %>
+  </div>
+
+  <% if @records.any? %>
+    <ol class="activity-list" role="list">
+      <% if @activity == "posts" %>
+        <% @records.each do |post| %>
+          <li><%= render "post", post: post %></li>
+        <% end %>
+      <% else %>
+        <% @records.each do |comment| %>
+          <li><%= render "comment", comment: comment %></li>
+        <% end %>
+      <% end %>
+    </ol>
+
+    <%= render "shared/pagination", result: @result %>
+  <% else %>
+    <p class="feed-empty"><%= t("profiles.empty.#{@activity}") %></p>
+  <% end %>
+</section>

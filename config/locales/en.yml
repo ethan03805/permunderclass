@@ -47,6 +47,7 @@ en:
     primary: "Primary navigation"
     home: "Home"
     submit: "Submit"
+    moderation: "Moderation"
     sign_in: "Sign in"
     sign_out: "Sign out"
     sign_up: "Create account"
@@ -99,6 +100,15 @@ en:
       eyebrow: "Constraints"
       title: "Visual rules"
       body: "The interface stays text-first, responsive, and restrained, with underlined links and no shadows or gradients."
+    pages:
+      eyebrow: "Pages"
+      title: "Reference"
+      links:
+        about: "About"
+        rules: "Rules"
+        faq: "FAQ"
+        privacy: "Privacy"
+        terms: "Terms"
   feed:
     title: "Feed"
     description: "Latest posts from the community."
@@ -137,6 +147,153 @@ en:
     title: "Tag: %{name}"
     not_found: "That tag does not exist."
     empty: "No published posts for this tag."
+  profiles:
+    eyebrow: "Profile"
+    title: "%{pseudonym}"
+    description: "Posts and comments from %{pseudonym}."
+    intro: "A minimal public history of posts and comments."
+    filters:
+      activity_label: "Profile history"
+      posts: "Posts"
+      comments: "Comments"
+      post_type_label: "Filter posts by type"
+      all_types: "All types"
+    empty:
+      posts: "No visible posts yet."
+      comments: "No visible comments yet."
+    post_statuses:
+      rewrite_requested: "Rewrite requested"
+      removed: "Removed"
+    comments:
+      on_post: "On"
+  reports:
+    actions:
+      report: "Report"
+      submit: "Send report"
+    fields:
+      reason_code: "Reason"
+      details: "Details"
+      details_hint: "Optional context for moderators."
+    notices:
+      created: "Your report has been submitted."
+    labels:
+      report_number: "Report #%{id}"
+      reporter: "Reporter"
+      reason: "Reason"
+      status: "Status"
+    statuses:
+      open: "Open"
+      resolved: "Resolved"
+      dismissed: "Dismissed"
+    reason_codes:
+      spam: "Spam"
+      hype: "Hype"
+      abuse: "Abuse"
+      off_topic: "Off topic"
+      other: "Other"
+  votes:
+    actions:
+      upvote: "Upvote"
+      downvote: "Downvote"
+    score:
+      one: "%{score} point"
+      other: "%{score} points"
+    upvotes:
+      one: "%{count} upvote"
+      other: "%{count} upvotes"
+    downvotes:
+      one: "%{count} downvote"
+      other: "%{count} downvotes"
+  comments:
+    eyebrow: "Comments"
+    title:
+      one: "1 comment"
+      other: "%{count} comments"
+    empty: "No comments yet."
+    replies:
+      one: "1 reply"
+      other: "%{count} replies"
+    sorts:
+      label: "Sort comments"
+      top: "Top"
+      new: "New"
+      controversial: "Controversial"
+    composer:
+      eyebrow: "Comment"
+      title: "Join the thread"
+      body_hint: "Keep it specific and concrete. Maximum length: 5,000 characters."
+      submit: "Publish comment"
+      submit_reply: "Publish reply"
+      sign_in_html: "Want to join the thread? <a href=\"%{sign_in_path}\">Sign in</a>."
+      verify_email: "Verify your email before commenting."
+    actions:
+      reply: "Reply"
+    meta:
+      edited_at: "Edited %{date}"
+    tombstone:
+      title: "Removed comment"
+      body: "This comment was removed by a moderator."
+    notices:
+      created: "Your comment has been published."
+  static_pages:
+    about:
+      eyebrow: "About"
+      title: "About"
+      description: "What this site is for."
+      intro: "This site is a restrained place for pseudonymous builders to share what they are making."
+      sections:
+        - title: "What belongs here"
+          body: "Use posts to share shipped work, work in progress, or concrete discussion prompts related to building a product."
+        - title: "What the product is optimizing for"
+          body: "The product aims for plain language, pseudonymous participation, and a low-drama environment instead of launch theatrics."
+    rules:
+      eyebrow: "Rules"
+      title: "Rules"
+      description: "Baseline participation rules."
+      intro: "The rules are intentionally short in v1 and may expand later."
+      sections:
+        - title: "Baseline"
+          items:
+            - "Say what you are making in plain language."
+            - "Keep criticism specific and about the work."
+            - "Do not post spam, harassment, or illegal content."
+            - "Do not evade moderation actions with alternate accounts."
+    faq:
+      eyebrow: "FAQ"
+      title: "FAQ"
+      description: "Basic answers about how the site works."
+      intro: "These answers are generic placeholders until the site is closer to launch."
+      sections:
+        - title: "Do I need an account to read?"
+          body: "No. Browsing is open."
+        - title: "Do I need an account to post, comment, or vote?"
+          body: "Yes. Posting, commenting, and voting require an account."
+        - title: "Do I need to use my real name?"
+          body: "No. Public identity is pseudonymous by default."
+    privacy:
+      eyebrow: "Privacy"
+      title: "Privacy"
+      description: "A generic placeholder privacy page."
+      intro: "This placeholder will be replaced with launch-ready copy before the site is public."
+      sections:
+        - title: "What is true in v1"
+          items:
+            - "No third-party tracking scripts are planned for the site."
+            - "Browsing is open, but posting, commenting, and voting require an account."
+            - "Operational analytics are expected to come from server-side logs and infrastructure metrics."
+        - title: "Before launch"
+          body: "The full privacy notice still needs a legal and policy review before launch."
+    terms:
+      eyebrow: "Terms"
+      title: "Terms"
+      description: "A generic placeholder terms page."
+      intro: "This placeholder sets expectations at a high level until final legal copy is ready."
+      sections:
+        - title: "Service expectations"
+          items:
+            - "The service may change, pause, or remove content as part of moderation or maintenance."
+            - "Accounts may be suspended or banned for rule violations."
+            - "Final legal terms still need review before launch."
   post_types:
     shipped: "Shipped"
     build: "Build"
@@ -257,6 +414,7 @@ en:
       already_signed_in: "You are already signed in."
       authentication_required: "You need to sign in before continuing."
       email_verification_required: "You need to verify your email before using that action."
+      moderation_required: "You need moderator access before using that page."
       account_states:
         suspended: "This account is suspended."
         banned: "This account is banned."
@@ -300,6 +458,113 @@ en:
         title: "Set a new password"
         intro: "Choose a new password for your account."
         submit: "Update password"
+  moderation:
+    fields:
+      public_note: "Public note"
+      internal_note: "Internal note"
+    notices:
+      rewrite_requested: "A rewrite has been requested."
+      post_removed: "The post has been removed."
+      post_restored: "The post has been restored."
+      comment_removed: "The comment has been removed."
+      report_dismissed: "The report has been dismissed."
+      user_suspended: "The account has been suspended."
+      user_banned: "The account has been banned."
+      tag_created: "The tag has been created."
+      tag_updated: "The tag has been updated."
+      tag_merged: "The tag merge has been completed."
+    action_labels:
+      rewrite_requested: "Rewrite requested"
+      restored: "Restored"
+      removed: "Removed"
+      comment_removed: "Comment removed"
+      user_suspended: "User suspended"
+      user_banned: "User banned"
+      tag_created: "Tag created"
+      tag_renamed: "Tag renamed"
+      tag_merged: "Tag merged"
+      tag_archived: "Tag archived"
+      report_dismissed: "Report dismissed"
+    queue:
+      eyebrow: "Moderation"
+      title: "Reports queue"
+      intro: "Open reports and the recent audit trail."
+      open_reports_eyebrow: "Queue"
+      open_reports_title: "Open reports"
+      empty: "No open reports right now."
+      review_link: "Review"
+    report_review:
+      intro: "Review the report, inspect the target, and apply the appropriate moderation action."
+      details_eyebrow: "Report"
+      details_title: "Report details"
+      actions_eyebrow: "Decision"
+      actions_title: "Resolve this report"
+      request_rewrite: "Request rewrite"
+      remove_post: "Remove post"
+      remove_comment: "Remove comment"
+      suspend_user: "Suspend user"
+      ban_user: "Ban user"
+      dismiss_report: "Dismiss report"
+      related_eyebrow: "History"
+      related_title: "Reports on this target"
+      target_actions_title: "Recent actions on this target"
+    audit:
+      eyebrow: "Audit"
+      title: "Recent moderator actions"
+      empty: "No moderator actions yet."
+    post_panel:
+      eyebrow: "Moderation"
+      title: "Post controls"
+      report_count:
+        one: "1 open report"
+        other: "%{count} open reports"
+      request_rewrite: "Request rewrite"
+      remove: "Remove post"
+      restore: "Restore post"
+    comment_panel:
+      eyebrow: "Moderation"
+      remove: "Remove comment"
+    user_panel:
+      review_link: "Review account"
+    user_review:
+      eyebrow: "Moderation"
+      title: "Account review: %{pseudonym}"
+      intro: "Review reports, recent activity, and moderation history for this account."
+      state_label: "State"
+      actions_eyebrow: "Decision"
+      actions_title: "Account actions"
+      suspend: "Suspend account"
+      ban: "Ban account"
+      reports_eyebrow: "Reports"
+      reports_title: "Reports on this account"
+      no_reports: "No reports on this account."
+      posts_eyebrow: "Posts"
+      posts_title: "Recent posts"
+      comments_eyebrow: "Comments"
+      comments_title: "Recent comments"
+      action_log_title: "Recent actions on this account"
+    tags:
+      eyebrow: "Moderation"
+      title: "Tag management"
+      intro: "Create, rename, merge, and archive tags."
+      create_eyebrow: "Create"
+      create_title: "Create tag"
+      create_submit: "Create tag"
+      merge_eyebrow: "Merge"
+      merge_title: "Merge tags"
+      merge_submit: "Merge tags"
+      source_label: "Source tag"
+      target_label: "Destination tag"
+      list_eyebrow: "Tags"
+      list_title: "All tags"
+      rename_submit: "Rename tag"
+      archive_submit: "Archive tag"
+      attached_posts:
+        one: "1 post"
+        other: "%{count} posts"
+      states:
+        active: "Active"
+        archived: "Archived"
   mailers:
     user_mailer:
       email_verification:

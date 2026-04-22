@@ -34,7 +34,7 @@ class SignUpFlowTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_select ".flash", I18n.t("auth.sign_up.success")
-    assert_select ".site-nav__status span", text: user.pseudonym
+    assert_select ".site-nav__status a[href='#{profile_path(user.pseudonym)}']", text: user.pseudonym
   end
 
   test "POST /sign-up re-renders when the form is invalid" do

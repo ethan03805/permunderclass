@@ -1,11 +1,18 @@
 <article class="post-card">
+  <%= render "shared/vote_controls",
+    target: post,
+    target_path: post_vote_path(post),
+    current_value: @post_vote_values.to_h[post.id],
+    interactive: current_user&.active? && current_user.email_verified?,
+    compact: true %>
+
   <h3 class="post-card__title">
     <%= link_to post.title, post_path(post) %>
   </h3>
 
   <p class="post-card__meta">
     <span class="eyebrow"><%= t("post_types.#{post.post_type}") %></span>
-    <span><%= post.user.pseudonym %></span>
+    <span><%= link_to post.user.pseudonym, profile_path(post.user.pseudonym) %></span>
     <time datetime="<%= post.published_at.iso8601 %>"><%= l(post.published_at, format: :short) %></time>
   </p>
 

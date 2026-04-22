@@ -1,0 +1,28 @@
+<% interactive = local_assigns.fetch(:interactive, false) %>
+<% compact = local_assigns.fetch(:compact, false) %>
+<% return_to = local_assigns.fetch(:return_to, request.fullpath) %>
+<% anchor = local_assigns[:anchor] %>
+
+<section class="vote-box <%= "vote-box--compact" if compact %>">
+  <% if interactive %>
+    <div class="vote-box__actions">
+      <%= button_to t("votes.actions.upvote"),
+        target_path,
+        params: { value: 1, return_to: return_to, anchor: anchor },
+        class: [ "vote-button", ("is-active" if current_value == 1) ].compact.join(" ") %>
+
+      <%= button_to t("votes.actions.downvote"),
+        target_path,
+        params: { value: -1, return_to: return_to, anchor: anchor },
+        class: [ "vote-button", ("is-active" if current_value == -1) ].compact.join(" ") %>
+    </div>
+  <% end %>
+
+  <p class="vote-box__summary">
+    <span><%= t("votes.score", count: target.score, score: target.score) %></span>
+    <span class="post-card__divider" aria-hidden="true">·</span>
+    <span><%= t("votes.upvotes", count: target.upvote_count) %></span>
+    <span class="post-card__divider" aria-hidden="true">·</span>
+    <span><%= t("votes.downvotes", count: target.downvote_count) %></span>
+  </p>
+</section>

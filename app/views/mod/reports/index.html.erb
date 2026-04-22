@@ -1,0 +1,42 @@
+<% content_for :title, page_title(t("moderation.queue.title")) %>
+
+<section class="page-stack moderation-layout">
+  <header class="auth-shell">
+    <p class="eyebrow"><%= t("moderation.queue.eyebrow") %></p>
+    <h1 class="section-title"><%= t("moderation.queue.title") %></h1>
+    <p class="section-intro"><%= t("moderation.queue.intro") %></p>
+  </header>
+
+  <section class="moderation-panel">
+    <p class="eyebrow"><%= t("moderation.queue.open_reports_eyebrow") %></p>
+    <h2 class="section-title"><%= t("moderation.queue.open_reports_title") %></h2>
+
+    <% if @open_reports.any? %>
+      <ol class="report-list" role="list">
+        <% @open_reports.each do |report| %>
+          <li class="report-list__item">
+            <p class="activity-item__meta">
+              <span><%= t("reports.labels.report_number", id: report.id) %></span>
+              <span class="post-card__divider" aria-hidden="true">·</span>
+              <span><%= report_reason_labels[report.reason_code] %></span>
+              <span class="post-card__divider" aria-hidden="true">·</span>
+              <span><%= report.reporter.pseudonym %></span>
+              <span class="post-card__divider" aria-hidden="true">·</span>
+              <time datetime="<%= report.created_at.iso8601 %>"><%= l(report.created_at, format: :short) %></time>
+            </p>
+            <p class="audit-log__target">
+              <%= link_to moderation_target_label(report.target), mod_report_path(report) %>
+            </p>
+          </li>
+        <% end %>
+      </ol>
+    <% else %>
+      <p class="feed-empty"><%= t("moderation.queue.empty") %></p>
+    <% end %>
+  </section>
+
+  <%= render "mod/shared/action_log",
+    actions: @recent_actions,
+    eyebrow: t("moderation.audit.eyebrow"),
+    title: t("moderation.audit.title") %>
+</section>

@@ -146,7 +146,7 @@
             <p class="eyebrow" data-post-form-target="previewType"><%= t("post_types.#{post.post_type}") %></p>
             <h3 class="post-detail__title" data-post-form-target="previewTitle" data-empty-text="<%= t("posts.preview.empty_title") %>"><%= post.title.presence || t("posts.preview.empty_title") %></h3>
             <p class="post-detail__meta">
-              <span><%= current_user.pseudonym %></span>
+              <span><%= link_to current_user.pseudonym, profile_path(current_user.pseudonym) %></span>
               <% if post.post_type_build? %>
                 <span class="post-card__divider" aria-hidden="true">·</span>
                 <span data-post-form-target="previewBuildStatus" data-empty-text="<%= t("posts.preview.build_status_placeholder") %>"><%= post.build_status.present? ? t("build_statuses.#{post.build_status}") : t("posts.preview.build_status_placeholder") %></span>

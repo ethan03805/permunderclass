@@ -1,0 +1,27 @@
+<details class="report-box" id="<%= anchor %>">
+  <summary><%= t("reports.actions.report") %></summary>
+
+  <%= form_with url: reports_path, class: "report-form" do |form| %>
+    <%= hidden_field_tag :target_type, target.class.name %>
+    <%= hidden_field_tag :target_id, target.id %>
+    <%= hidden_field_tag :return_to, return_to %>
+    <%= hidden_field_tag :anchor, anchor %>
+
+    <div class="field-group">
+      <%= form.label :reason_code, t("reports.fields.reason_code") %>
+      <%= form.select :reason_code,
+        options_for_select(report_reason_labels.map { |value, label| [ label, value ] }),
+        {},
+        name: "report[reason_code]",
+        class: "filter-select" %>
+    </div>
+
+    <div class="field-group">
+      <%= form.label :details, t("reports.fields.details") %>
+      <%= form.text_area :details, name: "report[details]", rows: 3, maxlength: 5000 %>
+      <p class="field-hint"><%= t("reports.fields.details_hint") %></p>
+    </div>
+
+    <%= form.submit t("reports.actions.submit"), class: "button" %>
+  <% end %>
+</details>
