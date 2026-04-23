@@ -38,11 +38,12 @@ en:
   app:
     name: "permanentunderclass.me"
     title: "permanentunderclass.me"
+    tagline: "Welcome to the permanent underclass"
     description: "Posts from pseudonymous builders sharing shipped work, work in progress, and discussion."
   layouts:
     skip_to_content: "Skip to main content"
-  header:
-    summary: "Posts from pseudonymous builders."
+  theme_toggle:
+    label: "Toggle dark mode"
   nav:
     primary: "Primary navigation"
     home: "Home"
@@ -53,8 +54,7 @@ en:
     sign_up: "Create account"
     account_label: "Account"
     account_state_label: "State"
-    availability_label: "Access"
-    availability_value: "Read without an account. Create one and verify your email to post, comment, or vote."
+    availability_value: "Create an account and verify your email to post, comment or vote."
     account_states:
       active: "Active"
       pending_email_verification: "Pending email verification"
