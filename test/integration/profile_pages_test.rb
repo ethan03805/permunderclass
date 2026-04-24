@@ -5,7 +5,7 @@ class ProfilePagesTest < ActionDispatch::IntegrationTest
     get profile_path(users(:active_member).pseudonym)
 
     assert_response :success
-    assert_select "h1", users(:active_member).pseudonym
+    assert_select "p.eyebrow#profile-title", users(:active_member).pseudonym
     assert_select ".activity-item", text: /#{Regexp.escape(posts(:commented_post).title)}/
     assert_select ".activity-item", text: /#{Regexp.escape(posts(:rewrite_requested_post).title)}/
     assert_select ".activity-item", text: /#{Regexp.escape(posts(:removed_post).title)}/, count: 0

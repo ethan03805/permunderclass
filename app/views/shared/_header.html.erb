@@ -2,7 +2,9 @@
   <div class="site-frame site-header__inner">
     <div class="site-header__brand">
       <%= link_to t("app.name"), root_path, class: "site-title" %>
-      <p class="site-header__summary"><%= t("header.summary") %></p>
+      <% if current_page?(root_path) %>
+        <p class="site-tagline"><%= t("app.tagline") %></p>
+      <% end %>
     </div>
 
     <%= render "shared/site_nav" %>

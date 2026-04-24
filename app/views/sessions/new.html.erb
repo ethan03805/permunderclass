@@ -1,9 +1,7 @@
 <% content_for :title, page_title(t("auth.sign_in.title")) %>
 
 <section class="auth-shell" aria-labelledby="sign-in-title">
-  <p class="eyebrow"><%= t("auth.sign_in.eyebrow") %></p>
-  <h1 id="sign-in-title" class="hero__title auth-shell__title"><%= t("auth.sign_in.title") %></h1>
-  <p class="lede"><%= t("auth.sign_in.intro") %></p>
+  <p id="sign-in-title" class="eyebrow"><%= t("auth.sign_in.eyebrow") %></p>
 
   <div class="form-shell">
     <%= form_with scope: :session, url: sign_in_path, class: "form-stack" do |form| %>

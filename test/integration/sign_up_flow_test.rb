@@ -9,7 +9,7 @@ class SignUpFlowTest < ActionDispatch::IntegrationTest
     get sign_up_path
 
     assert_response :success
-    assert_select "h1", I18n.t("auth.sign_up.title")
+    assert_select "p.eyebrow", I18n.t("auth.sign_up.eyebrow")
     assert_select "label", I18n.t("auth.fields.pseudonym")
   end
 
@@ -34,7 +34,7 @@ class SignUpFlowTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_select ".flash", I18n.t("auth.sign_up.success")
-    assert_select ".site-nav__status a[href='#{profile_path(user.pseudonym)}']", text: user.pseudonym
+    assert_select ".site-nav a[href='#{profile_path(user.pseudonym)}']", text: user.pseudonym
   end
 
   test "POST /sign-up creates an account when turnstile verification succeeds with production-shaped config" do
