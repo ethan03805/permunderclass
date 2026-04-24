@@ -28,7 +28,7 @@ class SignUpFlowTest < ActionDispatch::IntegrationTest
     user = User.order(:id).last
 
     assert_redirected_to root_path
-    assert user.pending_email_verification?
+    assert user.pending_enrollment?
     assert_nil user.email_verified_at
     assert_equal 1, ActionMailer::Base.deliveries.count
 
@@ -57,7 +57,7 @@ class SignUpFlowTest < ActionDispatch::IntegrationTest
     user = User.order(:id).last
 
     assert_redirected_to root_path
-    assert user.pending_email_verification?
+    assert user.pending_enrollment?
   end
 
   test "POST /sign-up re-renders when the form is invalid" do

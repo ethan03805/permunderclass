@@ -67,7 +67,7 @@ class UserTest < ActiveSupport::TestCase
     assert_not user.fresh_account?
 
     user.email_verified_at = 2.hours.ago
-    user.state = :pending_email_verification
+    user.state = :pending_enrollment
     assert_not user.fresh_account?
   end
 
