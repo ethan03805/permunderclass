@@ -1,20 +1,17 @@
 <footer class="site-footer">
   <div class="site-frame site-footer__grid">
-    <section class="site-footer__section" aria-labelledby="footer-site-title">
-      <p class="eyebrow"><%= t("footer.site.eyebrow") %></p>
-      <h2 id="footer-site-title" class="site-footer__title"><%= t("footer.site.title") %></h2>
+    <section class="site-footer__section">
+      <p class="eyebrow"><%= t("footer.site.title") %></p>
       <p class="site-footer__body"><%= t("footer.site.body") %></p>
     </section>
 
-    <section class="site-footer__section" aria-labelledby="footer-posts-title">
-      <p class="eyebrow"><%= t("footer.posts.eyebrow") %></p>
-      <h2 id="footer-posts-title" class="site-footer__title"><%= t("footer.posts.title") %></h2>
+    <section class="site-footer__section">
+      <p class="eyebrow"><%= t("footer.posts.title") %></p>
       <p class="site-footer__body"><%= t("footer.posts.body") %></p>
     </section>
 
-    <nav class="site-footer__section" aria-labelledby="footer-pages-title">
-      <p class="eyebrow"><%= t("footer.pages.eyebrow") %></p>
-      <h2 id="footer-pages-title" class="site-footer__title"><%= t("footer.pages.title") %></h2>
+    <nav class="site-footer__section" aria-label="<%= t("footer.pages.title") %>">
+      <p class="eyebrow"><%= t("footer.pages.title") %></p>
       <ul class="site-footer__links" role="list">
         <li><%= link_to t("footer.pages.links.about"), about_path %></li>
         <li><%= link_to t("footer.pages.links.rules"), rules_path %></li>

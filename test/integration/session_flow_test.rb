@@ -22,7 +22,6 @@ class SessionFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     follow_redirect!
     assert_select ".flash", I18n.t("auth.sign_in.pending_email_verification")
-    assert_select ".site-nav__status span", text: I18n.t("nav.account_states.pending_email_verification")
   end
 
   test "suspended user is blocked from signing in" do

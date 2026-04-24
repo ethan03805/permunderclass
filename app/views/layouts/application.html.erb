@@ -10,6 +10,16 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          if (saved === "dark" || saved === "light") {
+            document.documentElement.setAttribute("data-theme", saved);
+          }
+        } catch (e) {}
+      })();
+    </script>
 
     <%= yield :head %>
 
@@ -23,6 +33,13 @@
 
   <body>
     <a class="skip-link" href="#main-content"><%= t("layouts.skip_to_content") %></a>
+
+    <button type="button"
+            class="theme-toggle"
+            data-controller="theme-toggle"
+            data-action="click->theme-toggle#toggle"
+            aria-label="<%= t("theme_toggle.label") %>"
+            aria-pressed="false"></button>
 
     <div class="site-shell">
       <%= render "shared/header" %>

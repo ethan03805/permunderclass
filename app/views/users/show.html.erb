@@ -1,11 +1,9 @@
 <% content_for :title, page_title(t("profiles.title", pseudonym: @profile_user.pseudonym)) %>
 <% content_for :meta_description, t("profiles.description", pseudonym: @profile_user.pseudonym) %>
 
-<section class="profile-layout">
+<section class="profile-layout" aria-labelledby="profile-title">
   <header class="profile-header">
-    <p class="eyebrow"><%= t("profiles.eyebrow") %></p>
-    <h1 class="section-title"><%= t("profiles.title", pseudonym: @profile_user.pseudonym) %></h1>
-    <p class="section-intro"><%= t("profiles.intro") %></p>
+    <p id="profile-title" class="eyebrow"><%= @profile_user.pseudonym %></p>
 
     <% if reportable_by_current_user?(@profile_user) %>
       <%= render "reports/form",
@@ -22,8 +20,6 @@
   <% if current_user == @profile_user %>
     <section id="profile-preferences" class="form-shell">
       <p class="eyebrow"><%= t("profiles.preferences.eyebrow") %></p>
-      <h2 class="section-title"><%= t("profiles.preferences.title") %></h2>
-      <p><%= t("profiles.preferences.intro") %></p>
 
       <%= form_with model: @profile_user, url: profile_preferences_path(@profile_user.pseudonym), method: :patch, class: "form-stack" do |form| %>
         <label class="filter-checkbox">
@@ -51,12 +47,12 @@
       <nav class="filter-group" aria-label="<%= t("profiles.filters.post_type_label") %>">
         <%= link_to t("profiles.filters.all_types"),
           profile_path(@profile_user.pseudonym, feed_params_for(post_type: nil, page: nil)),
-          class: [ "filter-link", ("is-active" if @post_type.blank?) ].compact.join(" ") %>
+          class: [ "filter-inline-link", ("is-active" if @post_type.blank?) ].compact.join(" ") %>
 
         <% post_type_labels.each do |post_type, label| %>
           <%= link_to label,
             profile_path(@profile_user.pseudonym, feed_params_for(post_type: post_type, page: nil)),
-            class: [ "filter-link", ("is-active" if @post_type == post_type) ].compact.join(" ") %>
+            class: [ "filter-inline-link", ("is-active" if @post_type == post_type.to_s) ].compact.join(" ") %>
         <% end %>
       </nav>
     <% end %>
