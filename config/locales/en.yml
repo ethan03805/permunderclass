@@ -422,9 +422,9 @@ en:
     sign_up:
       eyebrow: "Account"
       title: "Create an account"
-      pseudonym_hint: "Use 3 to 30 letters, numbers, or underscores."
       submit: "Create account"
-      success: "Your account has been created. Check your email to verify it before interacting."
+      submitted: "Check your email to finish setting up your account."
+      pseudonym_hint: "Use 3 to 30 letters, numbers, or underscores."
       supporting_copy_html: "Already have an account? <a href=\"%{sign_in_path}\">Sign in</a>."
     sign_in:
       eyebrow: "Sign in"
