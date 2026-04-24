@@ -407,6 +407,7 @@ en:
       helper: "Enter the email you signed up with. If it matches an account, we'll send a link to set up a new authenticator."
       submit: "Send recovery link"
       submitted: "If an account exists, a recovery email has been sent."
+      link: "Can't access your authenticator? Recover access"
     totp:
       countdown_html: "Your code rotates in {seconds}."
       countdown_fallback: "Your code rotates every 30 seconds."
@@ -428,11 +429,10 @@ en:
     sign_in:
       eyebrow: "Sign in"
       title: "Sign in"
+      invalid_credentials: "Couldn't sign in. Your current code rotates every 30 seconds — try again with the next one."
+      success: "Signed in."
       submit: "Sign in"
-      success: "You are signed in."
-      pending_email_verification: "You are signed in. Verify your email before posting, commenting, or voting."
-      invalid_credentials: "Those credentials do not match an account."
-      supporting_copy_html: "Need an account? <a href=\"%{sign_up_path}\">Create one</a>."
+      supporting_copy_html: "Don't have an account? <a href=\"%{sign_up_path}\">Create one</a>."
     sign_out:
       success: "You are signed out."
     email_verification:
