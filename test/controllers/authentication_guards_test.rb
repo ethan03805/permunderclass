@@ -35,7 +35,9 @@ class VerifiedInteractionsControllerTest < ActionController::TestCase
   end
 
   test "pending user is redirected away from verified interaction" do
-    session[:user_id] = users(:pending_member).id
+    user = users(:pending_member)
+    session[:user_id] = user.id
+    session[:sessions_generation] = user.sessions_generation
 
     get :index
 
@@ -44,7 +46,9 @@ class VerifiedInteractionsControllerTest < ActionController::TestCase
   end
 
   test "active verified user may continue" do
-    session[:user_id] = users(:active_member).id
+    user = users(:active_member)
+    session[:user_id] = user.id
+    session[:sessions_generation] = user.sessions_generation
 
     get :index
 
@@ -65,7 +69,9 @@ class ActiveInteractionsControllerTest < ActionController::TestCase
   end
 
   test "suspended user is redirected away from active interaction" do
-    session[:user_id] = users(:suspended_member).id
+    user = users(:suspended_member)
+    session[:user_id] = user.id
+    session[:sessions_generation] = user.sessions_generation
 
     get :index
 
@@ -80,7 +86,9 @@ class ActiveInteractionsControllerTest < ActionController::TestCase
   end
 
   test "pending user is redirected until email is verified" do
-    session[:user_id] = users(:pending_member).id
+    user = users(:pending_member)
+    session[:user_id] = user.id
+    session[:sessions_generation] = user.sessions_generation
 
     get :index
 
@@ -89,7 +97,9 @@ class ActiveInteractionsControllerTest < ActionController::TestCase
   end
 
   test "banned user is redirected away from active interaction" do
-    session[:user_id] = users(:banned_member).id
+    user = users(:banned_member)
+    session[:user_id] = user.id
+    session[:sessions_generation] = user.sessions_generation
 
     get :index
 
