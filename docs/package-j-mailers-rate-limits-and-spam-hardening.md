@@ -81,3 +81,50 @@ Observed verification results:
 
 - On this machine, the default parallel test boot path can crash inside the local `pg` adapter before assertions run; using `PARALLEL_WORKERS=1` keeps the suite stable.
 - Video validation still depends on local `ffprobe` availability for the H.264 and duration checks, so those tests are skipped when that binary is absent.
+
+## Turnstile Submit Enforcement Follow-Up
+
+### What Changed
+
+This follow-up closes the remaining Turnstile gaps from Package J.
+
+- `TurnstileVerification` now posts to Cloudflare's current `https://challenges.cloudflare.com/turnstile/v0/siteverify` endpoint.
+- Turnstile verification now flows through a shared `ApplicationController` helper so sign-up and submit use the same server-side path.
+- The repo's existing fresh-account definition is now centralized on `User#fresh_account?` and reused by both submit-side Turnstile gating and `Rack::Attack`.
+- `/submit` now renders and verifies Turnstile for fresh accounts, while older verified accounts keep the existing unprotected submit path.
+- Post validation copy now includes the locale-backed Turnstile failure message needed for submit errors.
+
+### Files Added Or Modified
+
+- `app/controllers/application_controller.rb`
+- `app/controllers/posts_controller.rb`
+- `app/controllers/users_controller.rb`
+- `app/models/user.rb`
+- `app/services/turnstile_verification.rb`
+- `app/views/posts/new.html.erb`
+- `app/views/posts/edit.html.erb`
+- `app/views/posts/_form.html.erb`
+- `config/initializers/rack_attack.rb`
+- `config/locales/en.yml`
+- `test/integration/sign_up_flow_test.rb`
+- `test/integration/submit_flow_test.rb`
+- `test/models/user_test.rb`
+- `test/services/turnstile_verification_test.rb`
+
+### Verification
+
+Verified with:
+
+- `docker compose run --rm app bin/test`
+- `docker compose run --rm app bin/lint`
+- `docker compose run --rm app bin/security`
+
+Observed verification results:
+
+- `bin/test` passed with `248` runs, `883` assertions, `0` failures, `0` errors, and `0` skips
+- `bin/lint` passed with no offenses
+- `bin/security` passed with `0` Brakeman warnings and no bundled gem vulnerabilities
+
+### Follow-Up Work Or Known Limitations
+
+- Submit-side Turnstile intentionally treats the existing 24-hour fresh-account window as the suspicious-submit policy; broader retry- or content-based heuristics are still out of scope unless the plan changes.

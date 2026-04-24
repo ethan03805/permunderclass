@@ -77,7 +77,7 @@ class Rack::Attack
     return if user_id.blank?
 
     user = User.select(:id, :state, :email_verified_at).find_by(id: user_id)
-    return unless user&.active? && user.email_verified_at.present? && user.email_verified_at >= 24.hours.ago
+    return unless user&.fresh_account?
 
     user.id
   end

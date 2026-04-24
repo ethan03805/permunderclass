@@ -50,6 +50,27 @@ class UserTest < ActiveSupport::TestCase
     assert user.active?
   end
 
+  test "fresh_account? only applies to active users verified within the fresh-account window" do
+    user = User.new(
+      email: "fresh-check@example.com",
+      password: "password123",
+      password_confirmation: "password123",
+      pseudonym: "fresh_check",
+      state: :active,
+      email_verified_at: 2.hours.ago,
+      reply_alerts_enabled: true
+    )
+
+    assert user.fresh_account?
+
+    user.email_verified_at = 25.hours.ago
+    assert_not user.fresh_account?
+
+    user.email_verified_at = 2.hours.ago
+    user.state = :pending_email_verification
+    assert_not user.fresh_account?
+  end
+
   test "password must be at least eight characters when present" do
     user = User.new(
       email: "short@example.com",

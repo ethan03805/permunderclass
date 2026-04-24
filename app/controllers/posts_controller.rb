@@ -10,6 +10,7 @@ class PostsController < ApplicationController
     return render :type_picker unless selected_post_type.present?
 
     @post = current_user.posts.build(post_type: selected_post_type)
+    @turnstile_required = submit_turnstile_required?
   end
 
   def create
@@ -17,12 +18,17 @@ class PostsController < ApplicationController
 
     @selected_tag_ids = filtered_tag_ids
     @post = current_user.posts.build(post_params.except(:tag_ids))
+    @turnstile_required = submit_turnstile_required?
     spam_check_result = spam_check_result_for(:submit)
     mirror_linter_flags
-    selected_tags = selected_tags_for_assignment
 
     unless spam_check_result.allowed?
       @post.errors.add(:base, spam_check_result.error_key)
+      return render :new, status: :unprocessable_entity
+    end
+
+    if @turnstile_required && !turnstile_verified?
+      @post.errors.add(:base, :turnstile_failed)
       return render :new, status: :unprocessable_entity
     end
 
@@ -30,6 +36,8 @@ class PostsController < ApplicationController
       @post.errors.add(:tags, :too_many)
       return render :new, status: :unprocessable_entity
     end
+
+    selected_tags = selected_tags_for_assignment
 
     if @post.save
       @post.tags = selected_tags
@@ -129,6 +137,10 @@ class PostsController < ApplicationController
     preserved_archived_tags = @post.persisted? ? @post.tags.archived.to_a : []
 
     preserved_archived_tags + selected_tags
+  end
+
+  def submit_turnstile_required?
+    current_user&.fresh_account? || false
   end
 
   def republish_rewrite_requested_post

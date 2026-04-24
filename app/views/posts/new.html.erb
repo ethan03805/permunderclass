@@ -1,4 +1,10 @@
 <% content_for :title, page_title(t("posts.form.create_title")) %>
 <% content_for :meta_description, t("posts.form.intro") %>
 
-<%= render "form", post: @post %>
+<% if @turnstile_required && turnstile_site_key.present? %>
+  <% content_for :head do %>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <% end %>
+<% end %>
+
+<%= render "form", post: @post, turnstile_required: @turnstile_required %>

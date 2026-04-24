@@ -2,7 +2,7 @@ require "json"
 require "net/http"
 
 class TurnstileVerification
-  VERIFY_URI = URI("https://challenges.cloudflareturnstile.com/v0/siteverify")
+  VERIFY_URI = URI("https://challenges.cloudflare.com/turnstile/v0/siteverify")
 
   def initialize(token:, remote_ip:, secret_key: ENV.fetch("TURNSTILE_SECRET_KEY", nil), http_client: Net::HTTP)
     @http_client = http_client

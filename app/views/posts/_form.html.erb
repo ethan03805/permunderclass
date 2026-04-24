@@ -36,6 +36,12 @@
           <%= form.hidden_field :post_type, value: post.post_type %>
         <% end %>
 
+        <% if !post.persisted? && turnstile_required && turnstile_site_key.present? %>
+          <div class="field-group">
+            <div class="cf-turnstile" data-sitekey="<%= turnstile_site_key %>"></div>
+          </div>
+        <% end %>
+
         <div class="field-group">
           <label><%= t("posts.form.type_label") %></label>
           <p class="field-hint">

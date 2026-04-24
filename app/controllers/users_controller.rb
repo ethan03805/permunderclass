@@ -58,14 +58,6 @@ class UsersController < ApplicationController
   def set_profile_user
     @profile_user = User.find_by!(pseudonym: params[:pseudonym].to_s.strip.downcase)
   end
-
-  def turnstile_verified?
-    TurnstileVerification.new(
-      token: params["cf-turnstile-response"],
-      remote_ip: request.remote_ip
-    ).verified?
-  end
-
   def user_params
     params.require(:user).permit(:email, :password, :password_confirmation, :pseudonym)
   end
