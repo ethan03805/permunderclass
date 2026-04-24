@@ -6,6 +6,17 @@ class Rack::Attack
     request.ip if request.post? && request.path == "/sign-up"
   end
 
+  throttle("recoveries/ip", limit: 5, period: 1.hour) do |request|
+    request.ip if request.post? && request.path == "/recover"
+  end
+
+  throttle("recoveries/email", limit: 3, period: 1.hour) do |request|
+    if request.post? && request.path == "/recover"
+      email = request.params.dig("recovery", "email").to_s.strip.downcase.presence
+      "recovery:#{email}" if email
+    end
+  end
+
   blocklist("login_failures/ip") do |request|
     request.post? && request.path == "/sign-in" && LoginFailureTracker.blocked?(request.ip)
   end

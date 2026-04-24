@@ -157,4 +157,22 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
 
     assert_response :too_many_requests
   end
+
+  test "recovery requests are throttled per IP" do
+    with_stubbed_turnstile_verification(true) do
+      5.times do |index|
+        post recover_path,
+          params: { recovery: { email: "throttle#{index}@example.com" } },
+          headers: { "REMOTE_ADDR" => "10.0.0.7" }
+
+        assert_response :redirect
+      end
+
+      post recover_path,
+        params: { recovery: { email: "throttle-final@example.com" } },
+        headers: { "REMOTE_ADDR" => "10.0.0.7" }
+
+      assert_response :too_many_requests
+    end
+  end
 end
