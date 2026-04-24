@@ -401,6 +401,12 @@ en:
       invalid_token: "That link is invalid or has expired. Request a new one."
       invalid_code: "That code did not match. Try again with the current code from your authenticator."
       rate_limited: "Too many attempts. Try again in a few minutes."
+    recovery:
+      eyebrow: "Recover account access"
+      title: "Recover account access"
+      helper: "Enter the email you signed up with. If it matches an account, we'll send a link to set up a new authenticator."
+      submit: "Send recovery link"
+      submitted: "If an account exists, a recovery email has been sent."
     totp:
       countdown_html: "Your code rotates in {seconds}."
       countdown_fallback: "Your code rotates every 30 seconds."
