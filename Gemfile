@@ -15,7 +15,7 @@ gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
 
-# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
+# TOTP authentication [https://github.com/mdp/rotp]
 gem "rotp", "~> 6.3"
 gem "rqrcode", "~> 2.2"
 gem "rack-attack"
