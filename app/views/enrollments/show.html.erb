@@ -1,7 +1,7 @@
 <% content_for :title, page_title(t("auth.enrollment.title")) %>
 
 <section class="auth-shell" aria-labelledby="enrollment-title">
-  <p id="enrollment-title" class="eyebrow"><%= t("auth.enrollment.eyebrow") %></p>
+  <p id="enrollment-title" class="eyebrow" role="heading" aria-level="1"><%= t("auth.enrollment.eyebrow") %></p>
 
   <div class="form-shell">
     <% if @qr_svg %>

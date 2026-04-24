@@ -29,7 +29,8 @@ class EnrollmentsController < ApplicationController
     else
       LoginFailureTracker.track(ip)
       LoginFailureTracker.track_user(@user.id)
-      @qr_svg = render_qr_svg(candidate)
+      @user.begin_enrollment! if @user.totp_candidate_secret.blank?
+      @qr_svg = render_qr_svg(@user.reload.totp_candidate_secret)
       flash.now[:alert] = t("auth.enrollment.invalid_code")
       render :show, status: :unprocessable_entity
     end

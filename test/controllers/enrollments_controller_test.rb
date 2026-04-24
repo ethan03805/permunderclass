@@ -65,4 +65,17 @@ class EnrollmentsControllerTest < ActionDispatch::IntegrationTest
     assert user.reload.totp_candidate_secret.present?
     assert_equal original_secret, user.totp_secret, "in-use secret must not change before completion"
   end
+
+  test "POST /enroll/:token is rejected when the user is rate limited" do
+    user = users(:pending_member)
+    user.begin_enrollment!
+    token = user.generate_token_for(:enrollment)
+
+    LoginFailureTracker::USER_LIMIT.times { LoginFailureTracker.track_user(user.id) }
+
+    post enroll_confirm_path(token: token), params: { enrollment: { code: "000000" } }
+
+    assert_redirected_to enroll_path(token: token)
+    assert_equal I18n.t("auth.enrollment.rate_limited"), flash[:alert]
+  end
 end
