@@ -37,6 +37,12 @@ class User < ApplicationRecord
   validates :reply_alerts_enabled, inclusion: { in: [ true, false ] }
   validate :email_domain_must_not_be_disposable
 
+  ENROLLMENT_TOKEN_TTL = 30.minutes
+
+  generates_token_for :enrollment, expires_in: ENROLLMENT_TOKEN_TTL do
+    [ email_verified_at&.to_i || 0, enrollment_token_generation ]
+  end
+
   def email_verified?
     email_verified_at.present?
   end
@@ -49,6 +55,56 @@ class User < ApplicationRecord
     return if email_verified? || suspended? || banned?
 
     update!(email_verified_at: Time.current, state: :active)
+  end
+
+  def totp
+    return if totp_secret.blank?
+
+    @totp ||= ROTP::TOTP.new(totp_secret, issuer: Rails.configuration.x.totp_issuer || "permanentunderclass.me")
+  end
+
+  def verify_totp(code)
+    return false if totp.nil? || code.blank?
+
+    counter = totp.verify(code.to_s, drift_behind: 30, drift_ahead: 30, after: totp_last_used_counter)
+    return false if counter.nil?
+
+    update_column(:totp_last_used_counter, counter)
+    true
+  end
+
+  ENROLLMENT_CANDIDATE_TTL = 30.minutes
+
+  def begin_enrollment!
+    now = Time.current
+    fresh = totp_candidate_secret.blank? || totp_candidate_secret_expires_at.nil? || totp_candidate_secret_expires_at < now
+
+    return unless fresh
+
+    update!(
+      totp_candidate_secret: ROTP::Base32.random,
+      totp_candidate_secret_expires_at: now + ENROLLMENT_CANDIDATE_TTL
+    )
+  end
+
+  def complete_enrollment!
+    raise ActiveRecord::RecordInvalid.new(self), "No candidate secret" if totp_candidate_secret.blank?
+
+    updates = {
+      totp_secret: totp_candidate_secret,
+      totp_candidate_secret: nil,
+      totp_candidate_secret_expires_at: nil,
+      totp_last_used_counter: nil
+    }
+
+    if pending_enrollment?
+      updates[:state] = :active
+      updates[:email_verified_at] = Time.current
+    else
+      updates[:sessions_generation] = sessions_generation + 1
+    end
+
+    update!(updates)
   end
 
   private
