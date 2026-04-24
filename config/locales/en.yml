@@ -390,6 +390,20 @@ en:
       password: "Password"
       password_confirmation: "Confirm password"
       pseudonym: "Pseudonym"
+      code: "Code"
+    enrollment:
+      eyebrow: "Set up your authenticator"
+      title: "Set up your authenticator"
+      qr_alt: "QR code containing your authenticator setup URI"
+      instructions: "Scan the QR with any authenticator app (Duo, Google Authenticator, Authy, 1Password, etc.), then enter the 6-digit code it shows. If your app can't scan a QR code, copy the secret shown under the image into the app manually."
+      submit: "Finish setting up"
+      success: "You're set up. Welcome."
+      invalid_token: "That link is invalid or has expired. Request a new one."
+      invalid_code: "That code did not match. Try again with the current code from your authenticator."
+      rate_limited: "Too many attempts. Try again in a few minutes."
+    totp:
+      countdown_html: "Your code rotates in {seconds}."
+      countdown_fallback: "Your code rotates every 30 seconds."
     guards:
       already_signed_in: "You are already signed in."
       authentication_required: "You need to sign in before continuing."
