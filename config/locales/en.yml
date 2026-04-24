@@ -54,7 +54,7 @@ en:
     availability_value: "Create an account and verify your email to post, comment or vote."
     account_states:
       active: "Active"
-      pending_email_verification: "Pending email verification"
+      pending_enrollment: "Setup not complete"
       suspended: "Suspended"
       banned: "Banned"
   footer:
@@ -387,8 +387,6 @@ en:
   auth:
     fields:
       email: "Email"
-      password: "Password"
-      password_confirmation: "Confirm password"
       pseudonym: "Pseudonym"
       code: "Code"
     enrollment:
@@ -435,27 +433,6 @@ en:
       supporting_copy_html: "Don't have an account? <a href=\"%{sign_up_path}\">Create one</a>."
     sign_out:
       success: "You are signed out."
-    email_verification:
-      invalid: "That verification link is invalid or has expired."
-      already_verified: "That email address is already verified."
-      success: "Your email address is now verified."
-    password_reset:
-      link: "Reset password"
-      invalid: "That password reset link is invalid or has expired."
-      create:
-        success: "If the account exists, password reset instructions have been sent."
-      update:
-        success: "Your password has been updated."
-      new:
-        eyebrow: "Account recovery"
-        title: "Request a password reset"
-        intro: "Enter the email address linked to your account."
-        submit: "Send reset instructions"
-      edit:
-        eyebrow: "Account recovery"
-        title: "Set a new password"
-        intro: "Choose a new password for your account."
-        submit: "Update password"
   moderation:
     fields:
       public_note: "Public note"
@@ -565,18 +542,6 @@ en:
         archived: "Archived"
   mailers:
     user_mailer:
-      email_verification:
-        subject: "Verify your email address"
-        greeting: "Hello %{pseudonym},"
-        body: "Use the link below to verify your email address."
-        cta: "Verify email address"
-        expiry: "This link expires in 7 days."
-      password_reset:
-        subject: "Reset your password"
-        greeting: "Hello %{pseudonym},"
-        body: "Use the link below to choose a new password."
-        cta: "Reset password"
-        expiry: "This link expires in 30 minutes."
       enrollment_link:
         subject: "Finish setting up your account"
         greeting: "Hi %{pseudonym},"
@@ -612,8 +577,6 @@ en:
     attributes:
       user:
         email: "Email"
-        password: "Password"
-        password_confirmation: "Confirm password"
         pseudonym: "Pseudonym"
       tag:
         name: "Name"
@@ -650,10 +613,6 @@ en:
               disposable: "must use a non-disposable email address"
               invalid: "must be a valid email address"
               taken: "is already in use"
-            password:
-              blank: "must be present"
-              confirmation: "must match the confirmation"
-              too_short: "must be at least %{count} characters"
             pseudonym:
               blank: "must be present"
               invalid: "may include only letters, numbers, and underscores"
