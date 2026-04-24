@@ -5,7 +5,7 @@ class RecoveriesController < ApplicationController
 
   def create
     unless turnstile_verified?
-      redirect_to sign_in_path, notice: t("auth.recovery.submitted")
+      redirect_to sign_in_path, notice: t("auth.recovery.submitted"), status: :see_other
       return
     end
 
@@ -17,7 +17,7 @@ class RecoveriesController < ApplicationController
       UserMailer.enrollment_link(user).deliver_later
     end
 
-    redirect_to sign_in_path, notice: t("auth.recovery.submitted")
+    redirect_to sign_in_path, notice: t("auth.recovery.submitted"), status: :see_other
   end
 
   private

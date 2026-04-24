@@ -35,7 +35,7 @@ class UsersController < ApplicationController
 
     if @user.save
       UserMailer.enrollment_link(@user).deliver_later
-      redirect_to sign_in_path, notice: t("auth.sign_up.submitted")
+      redirect_to sign_in_path, notice: t("auth.sign_up.submitted"), status: :see_other
     else
       render :new, status: :unprocessable_entity
     end

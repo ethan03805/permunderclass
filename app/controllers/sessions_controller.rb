@@ -8,7 +8,7 @@ class SessionsController < ApplicationController
     ip = request.remote_ip
 
     if LoginFailureTracker.blocked?(ip)
-      redirect_to sign_in_path, alert: t("auth.sign_in.invalid_credentials")
+      redirect_to sign_in_path, alert: t("auth.sign_in.invalid_credentials"), status: :see_other
       return
     end
 
@@ -20,7 +20,7 @@ class SessionsController < ApplicationController
       LoginFailureTracker.reset(ip)
       LoginFailureTracker.reset_user(user.id)
       start_session_for(user)
-      redirect_to root_path, notice: t("auth.sign_in.success")
+      redirect_to root_path, notice: t("auth.sign_in.success"), status: :see_other
       return
     end
 
@@ -28,15 +28,15 @@ class SessionsController < ApplicationController
     LoginFailureTracker.track_user(user.id) if user
 
     if user&.suspended? || user&.banned?
-      redirect_to sign_in_path, alert: blocked_user_message(user)
+      redirect_to sign_in_path, alert: blocked_user_message(user), status: :see_other
     else
-      redirect_to sign_in_path, alert: t("auth.sign_in.invalid_credentials")
+      redirect_to sign_in_path, alert: t("auth.sign_in.invalid_credentials"), status: :see_other
     end
   end
 
   def destroy
     terminate_session
-    redirect_to root_path, notice: t("auth.sign_out.success")
+    redirect_to root_path, notice: t("auth.sign_out.success"), status: :see_other
   end
 
   private

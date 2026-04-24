@@ -13,7 +13,7 @@ class EnrollmentsController < ApplicationController
 
     ip = request.remote_ip
     if LoginFailureTracker.blocked?(ip) || LoginFailureTracker.blocked_user?(@user.id)
-      redirect_to enroll_path(token: params[:token]), alert: t("auth.enrollment.rate_limited")
+      redirect_to enroll_path(token: params[:token]), alert: t("auth.enrollment.rate_limited"), status: :see_other
       return
     end
 
@@ -25,7 +25,7 @@ class EnrollmentsController < ApplicationController
       LoginFailureTracker.reset(ip)
       LoginFailureTracker.reset_user(@user.id)
       start_session_for(@user)
-      redirect_to root_path, notice: t("auth.enrollment.success")
+      redirect_to root_path, notice: t("auth.enrollment.success"), status: :see_other
     else
       LoginFailureTracker.track(ip)
       LoginFailureTracker.track_user(@user.id)
