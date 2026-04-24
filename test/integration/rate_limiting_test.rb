@@ -87,8 +87,6 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     user = User.create!(
       pseudonym: "fresh_builder",
       email: "fresh@example.com",
-      password: "password123",
-      password_confirmation: "password123",
       state: :active,
       email_verified_at: 2.hours.ago
     )
