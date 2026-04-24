@@ -12,29 +12,27 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
   end
 
   test "sign-up requests are throttled by IP" do
-    3.times do |index|
+    with_stubbed_turnstile_verification(true) do
+      3.times do |index|
+        post sign_up_path, params: {
+          user: {
+            email: "duplicate#{index}@example.com",
+            pseudonym: "duplicate#{index}"
+          }
+        }.merge(spam_check_params(:sign_up)), headers: { "REMOTE_ADDR" => "10.0.0.5" }
+
+        assert_redirected_to sign_in_path
+      end
+
       post sign_up_path, params: {
         user: {
-          email: "duplicate#{index}@example.com",
-          password: "short",
-          password_confirmation: "mismatch",
-          pseudonym: "duplicate#{index}"
+          email: "fourth@example.com",
+          pseudonym: "fourth_builder"
         }
       }.merge(spam_check_params(:sign_up)), headers: { "REMOTE_ADDR" => "10.0.0.5" }
 
-      assert_response :unprocessable_entity
+      assert_response :too_many_requests
     end
-
-    post sign_up_path, params: {
-      user: {
-        email: "fourth@example.com",
-        password: "password123",
-        password_confirmation: "password123",
-        pseudonym: "fourth_builder"
-      }
-    }.merge(spam_check_params(:sign_up)), headers: { "REMOTE_ADDR" => "10.0.0.5" }
-
-    assert_response :too_many_requests
   end
 
   test "failed sign-in attempts are blocked after the configured limit" do
