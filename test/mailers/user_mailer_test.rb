@@ -6,7 +6,7 @@ class UserMailerTest < ActionMailer::TestCase
 
     mail = UserMailer.enrollment_link(user)
 
-    assert_equal [user.email], mail.to
+    assert_equal [ user.email ], mail.to
     assert_equal I18n.t("mailers.user_mailer.enrollment_link.subject"), mail.subject
     assert_not_nil mail.html_part, "HTML part missing"
     assert_not_nil mail.text_part, "text part missing"
