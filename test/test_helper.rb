@@ -38,7 +38,8 @@ module AuthenticationTestHelper
   def enroll_if_needed(user)
     return if user.totp_secret.present?
 
-    user.update!(totp_secret: ROTP::Base32.random, email_verified_at: Time.current)
+    user.update!(totp_secret: ROTP::Base32.random)
+    user.update!(email_verified_at: Time.current) if user.email_verified_at.nil?
     user.update!(state: :active) if user.pending_enrollment?
   end
 

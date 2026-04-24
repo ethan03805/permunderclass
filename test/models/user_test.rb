@@ -217,4 +217,30 @@ class UserTest < ActiveSupport::TestCase
 
     assert_nil User.find_by_token_for(:enrollment, token)
   end
+
+  test "complete_enrollment! burns the recovery token by bumping enrollment_token_generation" do
+    user = users(:active_member)
+    enroll_if_needed(user)
+
+    user.begin_enrollment!
+    token = user.generate_token_for(:enrollment)
+    user.complete_enrollment!
+
+    assert_nil User.find_by_token_for(:enrollment, token)
+  end
+
+  test "complete_enrollment! clears the memoized totp instance" do
+    user = users(:pending_member)
+    user.begin_enrollment!
+    candidate = user.totp_candidate_secret
+
+    # Force memoization against whatever totp_secret is right now (nil for pending)
+    user.totp
+
+    user.complete_enrollment!
+
+    # After completion, totp should be bound to the new (promoted) secret
+    refute_nil user.totp
+    assert_equal candidate, user.totp.secret
+  end
 end

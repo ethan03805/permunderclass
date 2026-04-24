@@ -88,7 +88,10 @@ class User < ApplicationRecord
   end
 
   def complete_enrollment!
-    raise ActiveRecord::RecordInvalid.new(self), "No candidate secret" if totp_candidate_secret.blank?
+    if totp_candidate_secret.blank?
+      errors.add(:base, "No candidate secret")
+      raise ActiveRecord::RecordInvalid, self
+    end
 
     updates = {
       totp_secret: totp_candidate_secret,
@@ -102,9 +105,11 @@ class User < ApplicationRecord
       updates[:email_verified_at] = Time.current
     else
       updates[:sessions_generation] = sessions_generation + 1
+      updates[:enrollment_token_generation] = enrollment_token_generation + 1
     end
 
     update!(updates)
+    @totp = nil
   end
 
   private
