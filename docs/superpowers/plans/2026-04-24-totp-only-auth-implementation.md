@@ -12,6 +12,14 @@
 - Preferred wrappers: `bin/test`, `bin/lint`, `bin/security`, `bin/dev`. Use these instead of invoking `bundle exec rails` directly.
 - Commit after every task using the git message style of the repo (short, factual, sentence case).
 - The overall suite will be **red between tasks** — this is expected during a big-bang rewrite. Each task restores green for its own surface. The suite returns to fully green at Task 17 + Task 20.
+- **UI style note (post UI-refactor merge from main):** auth pages use an eyebrow-only heading pattern. No `<h1>`, no `<p class="lede">` intro paragraph. Every new or replaced auth view in this plan follows the shape:
+  ```erb
+  <section class="auth-shell" aria-labelledby="X-title">
+    <p id="X-title" class="eyebrow"><%= t("auth.<section>.eyebrow") %></p>
+    <div class="form-shell"> ... </div>
+  </section>
+  ```
+  The `title:` locale key is retained for the `<title>` HTML tag via `content_for :title`. The `intro:` locale key is not used. If you see an existing view in the repo with an `<h1>`, follow the new pattern in the replacement.
 
 ---
 
@@ -952,9 +960,7 @@ end
 <% content_for :title, page_title(t("auth.enrollment.title")) %>
 
 <section class="auth-shell" aria-labelledby="enrollment-title">
-  <p class="eyebrow"><%= t("auth.enrollment.eyebrow") %></p>
-  <h1 id="enrollment-title" class="hero__title auth-shell__title"><%= t("auth.enrollment.title") %></h1>
-  <p class="lede"><%= t("auth.enrollment.intro") %></p>
+  <p id="enrollment-title" class="eyebrow"><%= t("auth.enrollment.eyebrow") %></p>
 
   <div class="form-shell">
     <% if @qr_svg %>
@@ -1028,11 +1034,10 @@ Otherwise, the Rails importmap + stimulus-loading conventions auto-discover `*_c
 In `config/locales/en.yml`, under `en:` → `auth:`, add:
 ```yaml
       enrollment:
-        eyebrow: "Account setup"
+        eyebrow: "Set up your authenticator"
         title: "Set up your authenticator"
-        intro: "Scan this code with your authenticator app, then enter the 6-digit code it shows."
         qr_alt: "QR code containing your authenticator setup URI"
-        instructions: "If your app can't scan a QR code, copy the secret shown under the image into the app manually."
+        instructions: "Scan the QR with any authenticator app (Duo, Google Authenticator, Authy, 1Password, etc.), then enter the 6-digit code it shows. If your app can't scan a QR code, copy the secret shown under the image into the app manually."
         submit: "Finish setting up"
         success: "You're set up. Welcome."
         invalid_token: "That link is invalid or has expired. Request a new one."
@@ -1041,7 +1046,10 @@ In `config/locales/en.yml`, under `en:` → `auth:`, add:
       totp:
         countdown_html: "Your code rotates in {seconds}."
         countdown_fallback: "Your code rotates every 30 seconds."
-      fields:
+```
+
+Also, under `en:` → `auth:` → `fields:` (if not already present), add:
+```yaml
         code: "Code"
 ```
 
@@ -1189,11 +1197,11 @@ end
 <% end %>
 
 <section class="auth-shell" aria-labelledby="recovery-title">
-  <p class="eyebrow"><%= t("auth.recovery.eyebrow") %></p>
-  <h1 id="recovery-title" class="hero__title auth-shell__title"><%= t("auth.recovery.title") %></h1>
-  <p class="lede"><%= t("auth.recovery.intro") %></p>
+  <p id="recovery-title" class="eyebrow"><%= t("auth.recovery.eyebrow") %></p>
 
   <div class="form-shell">
+    <p class="supporting-copy"><%= t("auth.recovery.helper") %></p>
+
     <%= form_with scope: :recovery, url: recover_path, class: "form-stack" do |form| %>
       <div class="field-group">
         <%= form.label :email, t("auth.fields.email") %>
@@ -1219,9 +1227,9 @@ end
 Under `en:` → `auth:` in `config/locales/en.yml`, add:
 ```yaml
       recovery:
-        eyebrow: "Account access"
+        eyebrow: "Recover account access"
         title: "Recover account access"
-        intro: "Enter the email you signed up with. If it matches an account, we'll send a link to set up a new authenticator."
+        helper: "Enter the email you signed up with. If it matches an account, we'll send a link to set up a new authenticator."
         submit: "Send recovery link"
         submitted: "If an account exists, a recovery email has been sent."
 ```
@@ -1372,9 +1380,7 @@ end
 <% content_for :title, page_title(t("auth.sign_in.title")) %>
 
 <section class="auth-shell" aria-labelledby="sign-in-title">
-  <p class="eyebrow"><%= t("auth.sign_in.eyebrow") %></p>
-  <h1 id="sign-in-title" class="hero__title auth-shell__title"><%= t("auth.sign_in.title") %></h1>
-  <p class="lede"><%= t("auth.sign_in.intro") %></p>
+  <p id="sign-in-title" class="eyebrow"><%= t("auth.sign_in.eyebrow") %></p>
 
   <div class="form-shell">
     <%= form_with scope: :session, url: sign_in_path, class: "form-stack" do |form| %>
@@ -1404,21 +1410,20 @@ end
 
 - [ ] **Step 3: Update sign-in locale keys**
 
-In `config/locales/en.yml`, under `en:` → `auth:` → `sign_in:`, update to:
+In `config/locales/en.yml`, under `en:` → `auth:` → `sign_in:`, keep the existing `eyebrow: "Sign in"` and `title: "Sign in"` (already updated by the recent UI refactor). Remove any `intro:` key if present. Update other keys to:
 ```yaml
       sign_in:
-        eyebrow: "Return"
+        eyebrow: "Sign in"
         title: "Sign in"
-        intro: "Enter your email and the 6-digit code from your authenticator app."
         invalid_credentials: "Couldn't sign in. Your current code rotates every 30 seconds — try again with the next one."
         success: "Signed in."
         submit: "Sign in"
-        supporting_copy_html: "Don't have an account? %{sign_up_path}".html_safe
+        supporting_copy_html: "Don't have an account? <a href=\"%{sign_up_path}\">Create one</a>."
 ```
 
-(Adjust the `supporting_copy_html` if the existing key is a different shape; preserve existing link-rendering behavior.)
+Delete any `pending_email_verification` sub-key from the `sign_in` block (it no longer applies — pending users can't sign in).
 
-And add `auth.recovery.link`:
+And extend `auth.recovery` (merged with the block added in Task 8) with:
 ```yaml
       recovery:
         # ... existing keys added in Task 8 ...
@@ -1489,7 +1494,7 @@ Note: `start_session_for(@user)` is removed — new accounts are unauthenticated
 
 - [ ] **Step 2: Update `app/views/users/new.html.erb`**
 
-Remove the two password field groups (`password` and `password_confirmation`). The resulting form should contain only `pseudonym`, `email`, Turnstile, and the submit button:
+Remove the two password field groups (`password` and `password_confirmation`). The resulting form should contain only `pseudonym`, `email`, Turnstile, and the submit button. Preserve the post-refactor eyebrow pattern (no `<h1>`, no intro paragraph):
 ```erb
 <% content_for :title, page_title(t("auth.sign_up.title")) %>
 
@@ -1500,9 +1505,7 @@ Remove the two password field groups (`password` and `password_confirmation`). T
 <% end %>
 
 <section class="auth-shell" aria-labelledby="sign-up-title">
-  <p class="eyebrow"><%= t("auth.sign_up.eyebrow") %></p>
-  <h1 id="sign-up-title" class="hero__title auth-shell__title"><%= t("auth.sign_up.title") %></h1>
-  <p class="lede"><%= t("auth.sign_up.intro") %></p>
+  <p id="sign-up-title" class="eyebrow"><%= t("auth.sign_up.eyebrow") %></p>
 
   <div class="form-shell">
     <%= render "shared/form_errors", object: @user %>
@@ -1539,24 +1542,20 @@ Remove the two password field groups (`password` and `password_confirmation`). T
 
 - [ ] **Step 3: Update sign-up locale keys**
 
-In `config/locales/en.yml` under `en:` → `auth:` → `sign_up:`, update:
+In `config/locales/en.yml` under `en:` → `auth:` → `sign_up:`, keep the existing `eyebrow:` and `title:` keys (already set to `"Account"` and `"Create an account"` by the recent UI refactor). Remove any `intro:` key if present. Replace the rest with:
 ```yaml
       sign_up:
-        eyebrow: "Join"
+        eyebrow: "Account"
         title: "Create an account"
-        intro: "Choose a pseudonym and enter your email. We'll send a link to set up your authenticator app."
         submit: "Create account"
         submitted: "Check your email to finish setting up your account."
-        pseudonym_hint: "3–30 characters. Letters, numbers, and underscores."
-        supporting_copy_html: "Already have an account? %{sign_in_path}".html_safe
+        pseudonym_hint: "Use 3 to 30 letters, numbers, or underscores."
+        supporting_copy_html: "Already have an account? <a href=\"%{sign_in_path}\">Sign in</a>."
 ```
 
-Remove (mark for deletion in Task 15):
-- Any `password` / `password_confirmation` labels
-- The old `sign_up.success` message if it implied an auto-session
-- Any `auth.password_reset.*` subtree (used to be in `auth.password_reset`) — these still exist; Task 15 deletes.
+Remove the old `sign_up.success` message (which implied an auto-session) — it's replaced by `sign_up.submitted`.
 
-For now, leave old keys in place to avoid breaking templates referenced by Task 16 deletions. Task 15 cleans them up.
+Leave the `auth.password_reset.*` subtree and `auth.fields.password*` keys in place for now — Task 15 cleans them up after all code references are gone.
 
 - [ ] **Step 4: Run any existing integration test that touches sign-up or sign-in (expect mostly red, some green)**
 
@@ -1851,6 +1850,29 @@ Under `en:` → `auth:` → `fields:`, remove:
 ```
 
 Also search globally in `en.yml` for any remaining `password:` or `password_confirmation:` field labels (e.g., in `activerecord.attributes.user`) and remove them.
+
+- [ ] **Step 4b: Rename the pending state enum key in the locale**
+
+Search `config/locales/en.yml` for every occurrence of `pending_email_verification:` used as a key under an `account_states:` block (typically `nav.account_states` and `auth.guards.account_states`). Rename each to `pending_enrollment:`. Keep the English label generic — e.g. `"Pending enrollment"` or `"Setup not complete"` — since the gate is now TOTP enrollment, not email verification.
+
+Example change under `en:` → `nav:` → `account_states:`:
+```yaml
+# before
+      account_states:
+        active: "Active"
+        pending_email_verification: "Pending email verification"
+        suspended: "Suspended"
+        banned: "Banned"
+
+# after
+      account_states:
+        active: "Active"
+        pending_enrollment: "Setup not complete"
+        suspended: "Suspended"
+        banned: "Banned"
+```
+
+Same transformation anywhere else `pending_email_verification` appears as a key (not a value).
 
 - [ ] **Step 5: Run the full test suite to catch missing-locale errors**
 
