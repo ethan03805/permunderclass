@@ -21,12 +21,11 @@ Rails.application.routes.draw do
   post "sign-up", to: "users#create"
   patch "u/:pseudonym/preferences", to: "users#update_preferences", as: :profile_preferences
 
-  get "password-reset", to: "password_resets#new", as: :password_reset
-  post "password-reset", to: "password_resets#create"
-  get "password-reset/:token", to: "password_resets#edit", as: :password_reset_token
-  patch "password-reset/:token", to: "password_resets#update"
+  get "recover", to: "recoveries#new", as: :recover
+  post "recover", to: "recoveries#create"
 
-  get "email-verification/:token", to: "email_verifications#show", as: :email_verification
+  get "enroll/:token", to: "enrollments#show", as: :enroll
+  post "enroll/:token", to: "enrollments#confirm", as: :enroll_confirm
 
   get "tags/:slug", to: "tags#show", as: :tag
   get "about", to: "static_pages#show", defaults: { page_key: "about" }, as: :about
