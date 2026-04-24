@@ -557,6 +557,12 @@ en:
         body: "Use the link below to choose a new password."
         cta: "Reset password"
         expiry: "This link expires in 30 minutes."
+      enrollment_link:
+        subject: "Finish setting up your account"
+        greeting: "Hi %{pseudonym},"
+        body: "Use the link below to set up your authenticator app. This is how you will sign in from now on."
+        cta: "Set up authenticator"
+        expiry: "This link expires in 30 minutes. If it expires, request a new one from the sign-in page."
     reply_alert_mailer:
       shared:
         greeting: "Hello %{pseudonym},"

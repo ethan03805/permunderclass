@@ -1,23 +1,21 @@
 require "test_helper"
 
 class UserMailerTest < ActionMailer::TestCase
-  include Rails.application.routes.url_helpers
-
-  test "email verification email includes the verification link" do
+  test "enrollment_link delivers a signed link addressed to the user" do
     user = users(:pending_member)
-    email = UserMailer.email_verification(user)
 
-    assert_equal [ user.email ], email.to
-    assert_equal I18n.t("mailers.user_mailer.email_verification.subject"), email.subject
-    assert_match(%r{http://example\.com/email-verification/}, email.body.encoded)
+    mail = UserMailer.enrollment_link(user)
+
+    assert_equal [user.email], mail.to
+    assert_equal I18n.t("mailers.user_mailer.enrollment_link.subject"), mail.subject
+    assert_match %r{http://.+/enroll/[A-Za-z0-9_\-]+}, mail.body.encoded
   end
 
-  test "password reset email includes the reset link" do
-    user = users(:active_member)
-    email = UserMailer.password_reset(user)
+  test "enrollment_link body references the pseudonym" do
+    user = users(:pending_member)
 
-    assert_equal [ user.email ], email.to
-    assert_equal I18n.t("mailers.user_mailer.password_reset.subject"), email.subject
-    assert_match(%r{http://example\.com/password-reset/}, email.body.encoded)
+    mail = UserMailer.enrollment_link(user)
+
+    assert_match user.pseudonym, mail.body.encoded
   end
 end
