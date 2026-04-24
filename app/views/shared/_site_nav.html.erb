@@ -10,18 +10,8 @@
           <%= link_to t("nav.submit"), submit_path, class: nav_link_class(submit_path) %>
         </li>
       <% end %>
-      <% if moderation_user? %>
-        <li>
-          <%= link_to t("nav.moderation"), mod_reports_path, class: nav_link_class(mod_reports_path) %>
-        </li>
-      <% end %>
-      <li class="site-nav__status">
-        <span class="eyebrow"><%= t("nav.account_label") %></span>
+      <li>
         <%= link_to current_user.pseudonym, profile_path(current_user.pseudonym), class: nav_link_class(profile_path(current_user.pseudonym)) %>
-      </li>
-      <li class="site-nav__status">
-        <span class="eyebrow"><%= t("nav.account_state_label") %></span>
-        <span><%= t("nav.account_states.#{current_user.state}") %></span>
       </li>
       <li>
         <%= button_to t("nav.sign_out"), sign_out_path, method: :delete, class: "site-nav__button" %>
@@ -33,9 +23,10 @@
       <li>
         <%= link_to t("nav.sign_up"), sign_up_path, class: nav_link_class(sign_up_path) %>
       </li>
-      <li class="site-nav__status">
-        <span><%= t("nav.availability_value") %></span>
-      </li>
     <% end %>
   </ul>
+
+  <% if current_user.blank? %>
+    <p class="site-nav__note"><%= t("nav.availability_value") %></p>
+  <% end %>
 </nav>

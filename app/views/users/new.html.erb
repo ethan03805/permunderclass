@@ -7,9 +7,7 @@
 <% end %>
 
 <section class="auth-shell" aria-labelledby="sign-up-title">
-  <p class="eyebrow"><%= t("auth.sign_up.eyebrow") %></p>
-  <h1 id="sign-up-title" class="hero__title auth-shell__title"><%= t("auth.sign_up.title") %></h1>
-  <p class="lede"><%= t("auth.sign_up.intro") %></p>
+  <p id="sign-up-title" class="eyebrow"><%= t("auth.sign_up.eyebrow") %></p>
 
   <div class="form-shell">
     <%= render "shared/form_errors", object: @user %>

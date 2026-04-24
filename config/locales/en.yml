@@ -48,12 +48,9 @@ en:
     primary: "Primary navigation"
     home: "Home"
     submit: "Submit"
-    moderation: "Moderation"
     sign_in: "Sign in"
     sign_out: "Sign out"
     sign_up: "Create account"
-    account_label: "Account"
-    account_state_label: "State"
     availability_value: "Create an account and verify your email to post, comment or vote."
     account_states:
       active: "Active"
@@ -62,15 +59,12 @@ en:
       banned: "Banned"
   footer:
     site:
-      eyebrow: "Site"
       title: "Using the site"
       body: "Browse without an account. Create one and verify your email before posting, commenting, or voting."
     posts:
-      eyebrow: "Posts"
       title: "What to post"
       body: "Use posts for shipped work, work in progress, or a focused discussion."
     pages:
-      eyebrow: "Pages"
       title: "More information"
       links:
         about: "About"
@@ -117,14 +111,10 @@ en:
     not_found: "That tag does not exist."
     empty: "No published posts for this tag."
   profiles:
-    eyebrow: "Profile"
     title: "%{pseudonym}"
     description: "Posts and comments from %{pseudonym}."
-    intro: "A minimal public history of posts and comments."
     preferences:
       eyebrow: "Preferences"
-      title: "Email alerts"
-      intro: "Choose whether replies to your comments and new comments on your posts should send email."
       reply_alerts_enabled: "Send reply alert emails"
       submit: "Save preferences"
       updated: "Your email alert preferences have been updated."
@@ -411,15 +401,13 @@ en:
     sign_up:
       eyebrow: "Account"
       title: "Create an account"
-      intro: "Use an email address and a pseudonym. Verification is required before posting, commenting, or voting."
       pseudonym_hint: "Use 3 to 30 letters, numbers, or underscores."
       submit: "Create account"
       success: "Your account has been created. Check your email to verify it before interacting."
       supporting_copy_html: "Already have an account? <a href=\"%{sign_in_path}\">Sign in</a>."
     sign_in:
-      eyebrow: "Session"
+      eyebrow: "Sign in"
       title: "Sign in"
-      intro: "Use the email address and password linked to your pseudonymous account."
       submit: "Sign in"
       success: "You are signed in."
       pending_email_verification: "You are signed in. Verify your email before posting, commenting, or voting."
