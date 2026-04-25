@@ -29,7 +29,7 @@ module Authentication
     return if authenticated_user? && current_user.active?
 
     return redirect_to(sign_in_path, alert: t("auth.guards.authentication_required")) unless authenticated_user?
-    return redirect_to(root_path, alert: t("auth.guards.email_verification_required")) if current_user.pending_email_verification?
+    return redirect_to(root_path, alert: t("auth.guards.email_verification_required")) if current_user.pending_enrollment?
 
     redirect_to root_path, alert: blocked_user_message(current_user)
   end
@@ -50,7 +50,7 @@ module Authentication
     return if authenticated_user? && current_user.active? && current_user.email_verified?
 
     return redirect_to(sign_in_path, alert: t("auth.guards.authentication_required")) unless authenticated_user?
-    return redirect_to(root_path, alert: blocked_user_message(current_user)) unless current_user.active? || current_user.pending_email_verification?
+    return redirect_to(root_path, alert: blocked_user_message(current_user)) unless current_user.active? || current_user.pending_enrollment?
 
     redirect_to root_path, alert: t("auth.guards.email_verification_required")
   end
@@ -64,12 +64,21 @@ module Authentication
   end
 
   def set_current_user
-    Current.user = User.find_by(id: session[:user_id]) if session[:user_id].present?
+    return if session[:user_id].blank?
+
+    user = User.find_by(id: session[:user_id])
+
+    if user && session[:sessions_generation] == user.sessions_generation
+      Current.user = user
+    else
+      reset_session
+    end
   end
 
   def start_session_for(user)
     reset_session
     session[:user_id] = user.id
+    session[:sessions_generation] = user.sessions_generation
     Current.user = user
   end
 

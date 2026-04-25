@@ -36,5 +36,16 @@ module PermanentUnderclass
     # config.eager_load_paths << Rails.root.join("extras")
     config.active_job.queue_adapter = :solid_queue
     config.cache_store = :solid_cache_store
+
+    # Active Record Encryption keys. Read from ENV so Docker/Render can inject them
+    # without a credentials-file edit. Rails 8 default would read from
+    # Rails.application.credentials.active_record_encryption.* — we deviate here
+    # to keep the Docker-on-Windows dev workflow friction-free. Set these in .env
+    # locally and in the Render dashboard for production.
+    config.active_record.encryption.primary_key = ENV.fetch("ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY", nil)
+    config.active_record.encryption.deterministic_key = ENV.fetch("ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY", nil)
+    config.active_record.encryption.key_derivation_salt = ENV.fetch("ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT", nil)
+
+    config.x.totp_issuer = "permanentunderclass.me"
   end
 end

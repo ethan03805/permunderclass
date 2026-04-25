@@ -1,0 +1,32 @@
+<% content_for :title, page_title(t("auth.recovery.title")) %>
+
+<% if turnstile_site_key.present? %>
+  <% content_for :head do %>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <% end %>
+<% end %>
+
+<section class="auth-shell" aria-labelledby="recovery-title">
+  <p id="recovery-title" class="eyebrow" role="heading" aria-level="1"><%= t("auth.recovery.eyebrow") %></p>
+
+  <div class="form-shell">
+    <p class="supporting-copy"><%= t("auth.recovery.helper") %></p>
+
+    <%= form_with scope: :recovery, url: recover_path, class: "form-stack" do |form| %>
+      <div class="field-group">
+        <%= form.label :email, t("auth.fields.email") %>
+        <%= form.email_field :email, autocomplete: "email", required: true %>
+      </div>
+
+      <% if turnstile_site_key.present? %>
+        <div class="field-group">
+          <div class="cf-turnstile" data-sitekey="<%= turnstile_site_key %>"></div>
+        </div>
+      <% end %>
+
+      <div class="actions-row">
+        <%= form.submit t("auth.recovery.submit"), class: "button" %>
+      </div>
+    <% end %>
+  </div>
+</section>

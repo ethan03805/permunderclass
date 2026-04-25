@@ -31,7 +31,7 @@ For now, UI copy stays generic and functional. Do not add jokes, slogans, or voi
 
 These are fixed:
 1. Ruby on Rails is the application stack.
-2. Email and password authentication is required in v1.
+2. Email and authenticator-app (TOTP) authentication is required in v1. No passwords.
 3. Browsing is anonymous.
 4. Posting, voting, and commenting require an account.
 5. Public identity is a pseudonym. Real names and phone numbers are never required.
@@ -134,11 +134,16 @@ Public identity is a pseudonym.
 Required fields:
 1. `pseudonym`
 2. `email`
-3. `password_digest`
+3. `totp_secret`
 4. `role`
 5. `state`
 6. `email_verified_at`
 7. `reply_alerts_enabled`
+8. `totp_candidate_secret`
+9. `totp_candidate_secret_expires_at`
+10. `totp_last_used_counter`
+11. `sessions_generation`
+12. `enrollment_token_generation`
 
 Rules:
 1. `pseudonym` is case-insensitive unique.
@@ -150,7 +155,7 @@ Rules:
    2. `moderator`
    3. `admin`
 6. `state` enum:
-   1. `pending_email_verification`
+   1. `pending_enrollment`
    2. `active`
    3. `suspended`
    4. `banned`
@@ -568,18 +573,21 @@ V1 auth includes:
 1. sign up
 2. sign in
 3. sign out
-4. email verification
-5. password reset
+4. TOTP enrollment via email-verified link
+5. TOTP recovery via email-verified link
 6. session management
 
 Rules:
-1. email verification is required before posting, commenting, or voting
-2. unverified users can sign in and browse
-3. no social login
-4. no magic links
-5. no passkeys
-6. no phone verification
-7. no mandatory real-name fields
+1. Sign-up collects email and pseudonym only. No password field exists.
+2. A sign-up creates a `pending_enrollment` user and enqueues an enrollment email. No session is started.
+3. Clicking the enrollment link lands the user on a QR + code-entry page. Scanning the QR with any authenticator app (Duo, Google Authenticator, Authy, 1Password, etc.) provisions the TOTP secret.
+4. On successful code entry, the account transitions to `active` and a session starts.
+5. Sign-in accepts email + 6-digit TOTP code on a single form.
+6. TOTP codes are single-use: a replayed code within its 30-second validity window is rejected.
+7. A "Recover access" link on the sign-in page sends a new enrollment email, which re-enrolls the authenticator. The old secret is not rotated until the user confirms a new code (recovery is reversible mid-flow).
+8. Recovery completion invalidates all other sessions for the user via the `sessions_generation` counter.
+9. No social login, no passkeys, no phone verification, no mandatory real-name fields.
+10. The enrollment/recovery email link is not a sign-in magic link — it only gates access to TOTP setup; the user still must enter a valid TOTP code to complete sign-in.
 
 ### 6.8 Reply Alerts
 
@@ -603,15 +611,19 @@ Use layered protection.
 Application-level limits:
 1. sign up:
    1. 3 per IP per hour
-2. login failures:
+2. sign-in code attempts:
    1. 10 per IP per 15 minutes
-3. post creation:
+   2. 5 per user per 15 minutes
+3. recovery email requests:
+   1. 5 per IP per hour
+   2. 3 per email per hour
+4. post creation:
    1. 2 per user per 24 hours
    2. 1 per user per 10 minutes
-4. comment creation:
+5. comment creation:
    1. 6 per user per minute
    2. 60 per user per hour
-5. vote mutations:
+6. vote mutations:
    1. 30 per user per minute
    2. 500 per user per day
 
@@ -656,9 +668,9 @@ Required v1 routes:
 10. `/terms`
 11. `/sign-in`
 12. `/sign-up`
-13. `/password-reset`
-14. `/password-reset/:token`
-15. `/email-verification/:token`
+13. `/recover`
+14. `/recover/:token`
+15. `/enroll/:token`
 16. `/mod/reports`
 17. `/mod/tags`
 18. `/mod/users/:id`
@@ -774,21 +786,23 @@ Can run in parallel with:
 
 Outputs:
 1. `User` model
-2. signed-cookie session auth
-3. sign-up, sign-in, and sign-out
-4. email verification
-5. password reset
-6. role and state guards
-7. Turnstile verification service
-8. account-state restrictions on post, comment, and vote actions
+2. signed-cookie session auth with sessions_generation invalidation
+3. sign-up (email + pseudonym only)
+4. TOTP enrollment via email-verified link
+5. sign-in (email + TOTP code, single form)
+6. TOTP recovery (re-enrollment via email-verified link)
+7. role and state guards
+8. Turnstile verification service
+9. account-state restrictions on post, comment, and vote actions
 
 Done when:
-1. sign up works
-2. sign in works
-3. password reset works
-4. unverified users cannot interact
-5. suspended and banned users are blocked
-6. tests cover auth flows and permission gates
+1. sign up creates a pending_enrollment user and sends an enrollment email
+2. completing enrollment activates the account and starts a session
+3. sign in works with email + TOTP code
+4. recovery works end-to-end (email link → new QR → new session; old sessions invalidated)
+5. replayed TOTP codes are rejected
+6. suspended and banned users are blocked from sign-in and guarded surfaces
+7. tests cover auth flows and permission gates
 
 Stop and ask user if:
 1. Turnstile keys are needed
@@ -1160,8 +1174,8 @@ Test depth should match a solo-maintained v1 community site.
 
 Must-have automated coverage:
 1. auth flows
-2. email verification
-3. password reset
+2. recovery flow (TOTP re-enrollment via email)
+3. TOTP enrollment flow
 4. per-type post validations
 5. media validation
 6. ranking math
@@ -1171,10 +1185,13 @@ Must-have automated coverage:
 10. rewrite-request behavior
 11. moderation permissions
 12. rate limiting boundaries
+13. TOTP replay prevention
+14. session invalidation on recovery completion
+15. candidate-secret reversibility (abandoned recovery leaves old authenticator working)
 
 Must-have system tests:
 1. anonymous browsing
-2. sign up and verify
+2. sign up and enroll TOTP
 3. create a `shipped` post
 4. create a `build` post with image
 5. create a `build` post with short mp4

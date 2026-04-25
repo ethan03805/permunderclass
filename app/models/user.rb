@@ -12,15 +12,16 @@ class User < ApplicationRecord
   has_many :moderator_actions, foreign_key: :moderator_id, dependent: :restrict_with_error
   has_many :targeted_moderator_actions, as: :target, class_name: "ModeratorAction", dependent: :restrict_with_error
 
-  has_secure_password
+  encrypts :totp_secret
+  encrypts :totp_candidate_secret
 
   enum :role, { member: 0, moderator: 1, admin: 2 }, default: :member, validate: true
   enum :state, {
-    pending_email_verification: 0,
+    pending_enrollment: 0,
     active: 1,
     suspended: 2,
     banned: 3
-  }, default: :pending_email_verification, validate: true
+  }, default: :pending_enrollment, validate: true
 
   before_validation :normalize_identifiers
 
@@ -28,7 +29,6 @@ class User < ApplicationRecord
     presence: true,
     format: { with: URI::MailTo::EMAIL_REGEXP },
     uniqueness: { case_sensitive: false }
-  validates :password, presence: true, length: { minimum: 8 }, if: :changing_password?
   validates :pseudonym,
     presence: true,
     format: { with: PSEUDONYM_FORMAT },
@@ -37,20 +37,14 @@ class User < ApplicationRecord
   validates :reply_alerts_enabled, inclusion: { in: [ true, false ] }
   validate :email_domain_must_not_be_disposable
 
-  generates_token_for :email_verification, expires_in: 7.days do
-    email_verified_at&.to_i || 0
-  end
+  ENROLLMENT_TOKEN_TTL = 30.minutes
 
-  generates_token_for :password_reset, expires_in: 30.minutes do
-    password_digest&.last(10)
+  generates_token_for :enrollment, expires_in: ENROLLMENT_TOKEN_TTL do
+    [ email_verified_at&.to_i || 0, enrollment_token_generation ]
   end
 
   def email_verified?
     email_verified_at.present?
-  end
-
-  def password_reset_permitted?
-    active? || pending_email_verification?
   end
 
   def fresh_account?(reference_time: Time.current)
@@ -63,15 +57,66 @@ class User < ApplicationRecord
     update!(email_verified_at: Time.current, state: :active)
   end
 
+  def totp
+    return if totp_secret.blank?
+
+    @totp ||= ROTP::TOTP.new(totp_secret, issuer: Rails.configuration.x.totp_issuer || "permanentunderclass.me")
+  end
+
+  def verify_totp(code)
+    return false if totp.nil? || code.blank?
+
+    counter = totp.verify(code.to_s, drift_behind: 30, drift_ahead: 30, after: totp_last_used_counter)
+    return false if counter.nil?
+
+    update_column(:totp_last_used_counter, counter)
+    true
+  end
+
+  ENROLLMENT_CANDIDATE_TTL = 30.minutes
+
+  def begin_enrollment!
+    now = Time.current
+    fresh = totp_candidate_secret.blank? || totp_candidate_secret_expires_at.nil? || totp_candidate_secret_expires_at < now
+
+    return unless fresh
+
+    update!(
+      totp_candidate_secret: ROTP::Base32.random,
+      totp_candidate_secret_expires_at: now + ENROLLMENT_CANDIDATE_TTL
+    )
+  end
+
+  def complete_enrollment!
+    if totp_candidate_secret.blank?
+      errors.add(:base, "No candidate secret")
+      raise ActiveRecord::RecordInvalid, self
+    end
+
+    updates = {
+      totp_secret: totp_candidate_secret,
+      totp_candidate_secret: nil,
+      totp_candidate_secret_expires_at: nil,
+      totp_last_used_counter: nil
+    }
+
+    if pending_enrollment?
+      updates[:state] = :active
+      updates[:email_verified_at] = Time.current
+    else
+      updates[:sessions_generation] = sessions_generation + 1
+      updates[:enrollment_token_generation] = enrollment_token_generation + 1
+    end
+
+    update!(updates)
+    @totp = nil
+  end
+
   private
 
   def normalize_identifiers
     self.email = email.to_s.strip.downcase.presence
     self.pseudonym = pseudonym.to_s.strip.downcase.presence
-  end
-
-  def changing_password?
-    new_record? || !password.nil?
   end
 
   def email_domain_must_not_be_disposable

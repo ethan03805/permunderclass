@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_163900) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_24_210140) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -309,11 +309,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_163900) do
     t.datetime "created_at", null: false
     t.citext "email", null: false
     t.datetime "email_verified_at"
-    t.string "password_digest", null: false
+    t.integer "enrollment_token_generation", default: 0, null: false
     t.citext "pseudonym", null: false
     t.boolean "reply_alerts_enabled", default: true, null: false
     t.integer "role", default: 0, null: false
+    t.integer "sessions_generation", default: 0, null: false
     t.integer "state", default: 0, null: false
+    t.text "totp_candidate_secret"
+    t.datetime "totp_candidate_secret_expires_at"
+    t.bigint "totp_last_used_counter"
+    t.text "totp_secret"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["pseudonym"], name: "index_users_on_pseudonym", unique: true

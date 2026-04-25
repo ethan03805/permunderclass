@@ -159,7 +159,7 @@
     </section>
   <% elsif !authenticated_user? %>
     <p class="comment-prompt"><%= t("comments.composer.sign_in_html", sign_in_path: sign_in_path) %></p>
-  <% elsif current_user.pending_email_verification? %>
+  <% elsif current_user.pending_enrollment? %>
     <p class="comment-prompt"><%= t("comments.composer.verify_email") %></p>
   <% end %>
 

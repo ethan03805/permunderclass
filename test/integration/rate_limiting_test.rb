@@ -12,29 +12,27 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
   end
 
   test "sign-up requests are throttled by IP" do
-    3.times do |index|
+    with_stubbed_turnstile_verification(true) do
+      3.times do |index|
+        post sign_up_path, params: {
+          user: {
+            email: "duplicate#{index}@example.com",
+            pseudonym: "duplicate#{index}"
+          }
+        }.merge(spam_check_params(:sign_up)), headers: { "REMOTE_ADDR" => "10.0.0.5" }
+
+        assert_redirected_to sign_in_path
+      end
+
       post sign_up_path, params: {
         user: {
-          email: "duplicate#{index}@example.com",
-          password: "short",
-          password_confirmation: "mismatch",
-          pseudonym: "duplicate#{index}"
+          email: "fourth@example.com",
+          pseudonym: "fourth_builder"
         }
       }.merge(spam_check_params(:sign_up)), headers: { "REMOTE_ADDR" => "10.0.0.5" }
 
-      assert_response :unprocessable_entity
+      assert_response :too_many_requests
     end
-
-    post sign_up_path, params: {
-      user: {
-        email: "fourth@example.com",
-        password: "password123",
-        password_confirmation: "password123",
-        pseudonym: "fourth_builder"
-      }
-    }.merge(spam_check_params(:sign_up)), headers: { "REMOTE_ADDR" => "10.0.0.5" }
-
-    assert_response :too_many_requests
   end
 
   test "failed sign-in attempts are blocked after the configured limit" do
@@ -87,8 +85,6 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     user = User.create!(
       pseudonym: "fresh_builder",
       email: "fresh@example.com",
-      password: "password123",
-      password_confirmation: "password123",
       state: :active,
       email_verified_at: 2.hours.ago
     )
@@ -156,5 +152,23 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :too_many_requests
+  end
+
+  test "recovery requests are throttled per IP" do
+    with_stubbed_turnstile_verification(true) do
+      5.times do |index|
+        post recover_path,
+          params: { recovery: { email: "throttle#{index}@example.com" } },
+          headers: { "REMOTE_ADDR" => "10.0.0.7" }
+
+        assert_response :redirect
+      end
+
+      post recover_path,
+        params: { recovery: { email: "throttle-final@example.com" } },
+        headers: { "REMOTE_ADDR" => "10.0.0.7" }
+
+      assert_response :too_many_requests
+    end
   end
 end

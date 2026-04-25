@@ -34,10 +34,8 @@ class UsersController < ApplicationController
     end
 
     if @user.save
-      start_session_for(@user)
-      UserMailer.email_verification(@user).deliver_now
-
-      redirect_to root_path, notice: t("auth.sign_up.success")
+      UserMailer.enrollment_link(@user).deliver_later
+      redirect_to sign_in_path, notice: t("auth.sign_up.submitted"), status: :see_other
     else
       render :new, status: :unprocessable_entity
     end
@@ -59,7 +57,7 @@ class UsersController < ApplicationController
     @profile_user = User.find_by!(pseudonym: params[:pseudonym].to_s.strip.downcase)
   end
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :pseudonym)
+    params.require(:user).permit(:email, :pseudonym)
   end
 
   def profile_preferences_params

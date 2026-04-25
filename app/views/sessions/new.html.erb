@@ -1,23 +1,26 @@
 <% content_for :title, page_title(t("auth.sign_in.title")) %>
 
 <section class="auth-shell" aria-labelledby="sign-in-title">
-  <p id="sign-in-title" class="eyebrow"><%= t("auth.sign_in.eyebrow") %></p>
+  <p id="sign-in-title" class="eyebrow" role="heading" aria-level="1"><%= t("auth.sign_in.eyebrow") %></p>
 
   <div class="form-shell">
-    <%= form_with scope: :session, url: sign_in_path, class: "form-stack" do |form| %>
+    <%= form_with scope: :session, url: sign_in_path, class: "form-stack", data: { turbo: false } do |form| %>
       <div class="field-group">
         <%= form.label :email, t("auth.fields.email") %>
         <%= form.email_field :email, autocomplete: "email", required: true %>
       </div>
 
       <div class="field-group">
-        <%= form.label :password, t("auth.fields.password") %>
-        <%= form.password_field :password, autocomplete: "current-password", required: true %>
+        <%= form.label :code, t("auth.fields.code") %>
+        <%= form.text_field :code, inputmode: "numeric", autocomplete: "one-time-code", pattern: "[0-9]*", maxlength: 6, required: true %>
+        <p class="field-hint" data-controller="totp-countdown" data-totp-countdown-template-value="<%= t("auth.totp.countdown_html") %>">
+          <%= t("auth.totp.countdown_fallback") %>
+        </p>
       </div>
 
       <div class="actions-row">
         <%= form.submit t("auth.sign_in.submit"), class: "button" %>
-        <%= link_to t("auth.password_reset.link"), password_reset_path, class: "auxiliary-link" %>
+        <%= link_to t("auth.recovery.link"), recover_path, class: "auxiliary-link" %>
       </div>
     <% end %>
 

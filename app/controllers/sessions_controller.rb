@@ -5,40 +5,43 @@ class SessionsController < ApplicationController
   def new; end
 
   def create
-    user = User.authenticate_by(email: session_params[:email].to_s.strip.downcase, password: session_params[:password])
+    ip = request.remote_ip
 
-    if user.nil?
-      LoginFailureTracker.track(request.remote_ip)
-      redirect_to sign_in_path, alert: t("auth.sign_in.invalid_credentials")
+    if LoginFailureTracker.blocked?(ip)
+      redirect_to sign_in_path, alert: t("auth.sign_in.invalid_credentials"), status: :see_other
       return
     end
 
-    if user.suspended? || user.banned?
-      LoginFailureTracker.track(request.remote_ip)
-      redirect_to sign_in_path, alert: blocked_user_message(user)
+    email = session_params[:email].to_s.strip.downcase
+    code = session_params[:code].to_s
+    user = User.find_by(email: email) if email.present?
+
+    if user&.active? && !LoginFailureTracker.blocked_user?(user.id) && user.verify_totp(code)
+      LoginFailureTracker.reset(ip)
+      LoginFailureTracker.reset_user(user.id)
+      start_session_for(user)
+      redirect_to root_path, notice: t("auth.sign_in.success"), status: :see_other
       return
     end
 
-    LoginFailureTracker.reset(request.remote_ip)
-    start_session_for(user)
-    redirect_to root_path, notice: sign_in_notice_for(user)
+    LoginFailureTracker.track(ip)
+    LoginFailureTracker.track_user(user.id) if user
+
+    if user&.suspended? || user&.banned?
+      redirect_to sign_in_path, alert: blocked_user_message(user), status: :see_other
+    else
+      redirect_to sign_in_path, alert: t("auth.sign_in.invalid_credentials"), status: :see_other
+    end
   end
 
   def destroy
     terminate_session
-
-    redirect_to root_path, notice: t("auth.sign_out.success")
+    redirect_to root_path, notice: t("auth.sign_out.success"), status: :see_other
   end
 
   private
 
   def session_params
-    params.require(:session).permit(:email, :password)
-  end
-
-  def sign_in_notice_for(user)
-    return t("auth.sign_in.pending_email_verification") unless user.email_verified?
-
-    t("auth.sign_in.success")
+    params.require(:session).permit(:email, :code)
   end
 end

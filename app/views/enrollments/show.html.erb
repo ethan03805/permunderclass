@@ -1,0 +1,29 @@
+<% content_for :title, page_title(t("auth.enrollment.title")) %>
+
+<section class="auth-shell" aria-labelledby="enrollment-title">
+  <p id="enrollment-title" class="eyebrow" role="heading" aria-level="1"><%= t("auth.enrollment.eyebrow") %></p>
+
+  <div class="form-shell">
+    <% if @qr_svg %>
+      <figure class="totp-qr" aria-label="<%= t("auth.enrollment.qr_alt") %>">
+        <%= raw @qr_svg %>
+      </figure>
+
+      <p class="supporting-copy"><%= t("auth.enrollment.instructions") %></p>
+
+      <%= form_with scope: :enrollment, url: enroll_confirm_path(token: params[:token]), class: "form-stack", data: { turbo: false } do |form| %>
+        <div class="field-group">
+          <%= form.label :code, t("auth.fields.code") %>
+          <%= form.text_field :code, inputmode: "numeric", autocomplete: "one-time-code", pattern: "[0-9]*", maxlength: 6, required: true %>
+          <p class="field-hint" data-controller="totp-countdown" data-totp-countdown-template-value="<%= t("auth.totp.countdown_html") %>">
+            <%= t("auth.totp.countdown_fallback") %>
+          </p>
+        </div>
+
+        <div class="actions-row">
+          <%= form.submit t("auth.enrollment.submit"), class: "button" %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</section>

@@ -1,0 +1,7 @@
+<p><%= t("mailers.user_mailer.enrollment_link.greeting", pseudonym: @user.pseudonym) %></p>
+
+<p><%= t("mailers.user_mailer.enrollment_link.body") %></p>
+
+<p><%= link_to t("mailers.user_mailer.enrollment_link.cta"), @enrollment_url %></p>
+
+<p><%= t("mailers.user_mailer.enrollment_link.expiry") %></p>

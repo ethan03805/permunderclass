@@ -24,13 +24,27 @@ module ActiveSupport
 end
 
 module AuthenticationTestHelper
-  def sign_in_as(user, password: "password123")
+  # Note: the replay-prevention counter means reusing sign_in_as for the
+  # same user within the same 30-second TOTP window will fail the second
+  # time. Tests that sign in multiple times per user must travel 31+
+  # seconds between calls or use different users.
+  def sign_in_as(user)
+    enroll_if_needed(user)
     post sign_in_path, params: {
-      session: {
-        email: user.email,
-        password: password
-      }
+      session: { email: user.email, code: valid_totp_code_for(user) }
     }
+  end
+
+  def enroll_if_needed(user)
+    return if user.totp_secret.present?
+
+    user.update!(totp_secret: ROTP::Base32.random)
+    user.update!(email_verified_at: Time.current) if user.email_verified_at.nil?
+    user.update!(state: :active) if user.pending_enrollment?
+  end
+
+  def valid_totp_code_for(user)
+    ROTP::TOTP.new(user.totp_secret).now
   end
 
   def with_env(overrides)
@@ -133,5 +147,6 @@ end
 
 class ActiveSupport::TestCase
   include ActiveJob::TestHelper
+  include AuthenticationTestHelper
   include MediaTestHelper
 end
