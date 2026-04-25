@@ -20,6 +20,7 @@ class EnrollmentFlowTest < ActionDispatch::IntegrationTest
     get enroll_path(token: token)
     assert_response :success
     assert user.reload.totp_candidate_secret.present?
+    assert_select "form[action='#{enroll_confirm_path(token: token)}'][data-turbo='false']"
 
     # Submit a valid code
     code = ROTP::TOTP.new(user.totp_candidate_secret).now
@@ -27,6 +28,8 @@ class EnrollmentFlowTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to root_path
     assert_equal user.id, session[:user_id]
+    follow_redirect!
+    assert_select "a[href='#{profile_path(user.pseudonym)}']", text: user.pseudonym
     user.reload
     assert user.active?
     assert user.totp_secret.present?

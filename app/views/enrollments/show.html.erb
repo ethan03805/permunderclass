@@ -11,7 +11,7 @@
 
       <p class="supporting-copy"><%= t("auth.enrollment.instructions") %></p>
 
-      <%= form_with scope: :enrollment, url: enroll_confirm_path(token: params[:token]), class: "form-stack" do |form| %>
+      <%= form_with scope: :enrollment, url: enroll_confirm_path(token: params[:token]), class: "form-stack", data: { turbo: false } do |form| %>
         <div class="field-group">
           <%= form.label :code, t("auth.fields.code") %>
           <%= form.text_field :code, inputmode: "numeric", autocomplete: "one-time-code", pattern: "[0-9]*", maxlength: 6, required: true %>

@@ -14,7 +14,7 @@
         <%= link_to current_user.pseudonym, profile_path(current_user.pseudonym), class: nav_link_class(profile_path(current_user.pseudonym)) %>
       </li>
       <li>
-        <%= button_to t("nav.sign_out"), sign_out_path, method: :delete, class: "site-nav__button" %>
+        <%= button_to t("nav.sign_out"), sign_out_path, method: :delete, class: "site-nav__button", form: { data: { turbo: false } } %>
       </li>
     <% else %>
       <li>

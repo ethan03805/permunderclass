@@ -4,7 +4,7 @@
   <p id="sign-in-title" class="eyebrow" role="heading" aria-level="1"><%= t("auth.sign_in.eyebrow") %></p>
 
   <div class="form-shell">
-    <%= form_with scope: :session, url: sign_in_path, class: "form-stack" do |form| %>
+    <%= form_with scope: :session, url: sign_in_path, class: "form-stack", data: { turbo: false } do |form| %>
       <div class="field-group">
         <%= form.label :email, t("auth.fields.email") %>
         <%= form.email_field :email, autocomplete: "email", required: true %>

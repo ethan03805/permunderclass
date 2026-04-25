@@ -1,6 +1,12 @@
 require "test_helper"
 
 class SignInFlowTest < ActionDispatch::IntegrationTest
+  test "sign-in form bypasses turbo preview caching" do
+    get sign_in_path
+
+    assert_select "form[action='#{sign_in_path}'][data-turbo='false']"
+  end
+
   test "active user signs in with email + valid TOTP code" do
     user = users(:active_member)
     enroll_if_needed(user)
@@ -11,6 +17,9 @@ class SignInFlowTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to root_path
     assert_equal user.id, session[:user_id]
+    follow_redirect!
+    assert_select "a[href='#{profile_path(user.pseudonym)}']", text: user.pseudonym
+    assert_select "form[action='#{sign_out_path}'][data-turbo='false']"
   end
 
   test "wrong code shows generic error and does not sign in" do
